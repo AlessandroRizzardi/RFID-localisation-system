@@ -1,51 +1,118 @@
-clear 
-close all
-clc
+%% Initialization2  
+% close all;
+clear;  
+clc;
 
-reader1 = [30, 10];
-reader2 = [-35, 0];
-reader3 = [-20, 25];
-reader4 = [0, -20];
-readers = [reader1; reader2; reader3];  % Use semicolons to create a matrix
-tag = [0, 0];
-NOISE = true;
+addpath('Data')
+addpath('Scripts')
+addpath('Functions')
+addpath('Classes')
 
-Rmax = 70;
-lamda = 20;
+% Load the configuration parameters for the algorithms
+config
+     
+% Load the data
+load_data
 
-distance1 = get_tagDistance(tag, reader1);
-distance2 = get_tagDistance(tag, reader2);
-distance3 = get_tagDistance(tag, reader3);
-distance4 = get_tagDistance(tag, reader4);
+gt = readmatrix(select_GT);
 
-phase_measured1 = phase_measured(distance1, lamda);
-phase_measured2 = phase_measured(distance2, lamda);
-phase_measured3 = phase_measured(distance3, lamda);
-phase_measured4 = phase_measured(distance4, lamda);
+% Run EKF
+EKF
 
-if NOISE == true
-    phase_measured1 = get_measurement(phase_measured1);
-    phase_measured2 = get_measurement(phase_measured2);
-    phase_measured3 = get_measurement(phase_measured3);
-    phase_measured4 = get_measurement(phase_measured4);
+
+%% Ground truth comparison
+if GT
+
+    figure(10),clf, hold on;
+    plot(gt(:,2),gt(:,3),'-k');
+    
+    for i = 1:length(pos_robot)
+        
+        posx(i) = pos_robot{i,1}(1);
+        posy(i) = pos_robot{i,1}(2);
+        th(i) = pos_robot{i,1}(3);
+
+        covx(i) = cov_robot{i,1}(1,1);
+        covy(i) = cov_robot{i,1}(2,2);  
+        covt(i) = cov_robot{i,1}(3,3);  
+    end
+    
+    plot(tag1.x(1),tag1.x(2),'*b','MarkerSize',10)
+    plot(tag2.x(1),tag2.x(2),'*b','MarkerSize',10)
+    plot(tag3.x(1),tag3.x(2),'*b','MarkerSize',10)
+    plot(tag4.x(1),tag4.x(2),'*b','MarkerSize',10)
+
+    plot(posx,posy,'-r')
+    legend('Ground truth','Estimated','Location','best')
+    title('GT Vs. EST')
+    xlabel ('x [m]');
+    ylabel ('y [m]');
+    %
+    figure(5),clf
+    errx = gt(:,2)' - posx;
+    plot(1:1:length(gt),errx)
+    hold on
+    erry = gt(:,3)' - posy;
+    plot(1:1:length(gt),erry)
+    legend('Est. error x','Est. error y','Location','best')
+    title('Estimation errors x and y')
+    xlabel ('Iteration');
+    ylabel ('[m]');
+
+    %
+    figure(6), clf;
+    plot(1:1:length(gt),errx)
+    hold on
+    plot(1:1:length(gt),2*covx,'r');
+    hold on
+    plot(1:1:length(gt),-2*covx,'r');
+    hold on
+    plot(1:1:length(gt),3*covx,'g');
+    hold on
+    plot(1:1:length(gt),-3*covx,'g');
+
+    legend('Est. error x','Est. covariance x (97%)','','Est. covariance x (99%)','Location','best')
+    title('Estimation errors x')
+    xlabel ('Iteration');
+    ylabel ('[m]');
+    %
+    figure(7), clf;
+    plot(1:1:length(gt),erry)
+    hold on
+    plot(1:1:length(gt),2*covy,'r');
+    hold on
+    plot(1:1:length(gt),-2*covy,'r');
+    hold on
+    plot(1:1:length(gt),3*covy,'g');
+    hold on
+    plot(1:1:length(gt),-3*covy,'g');
+
+    legend('Est. error y','Est. covariance y (97%)','','Est. covariance y (99%)','Location','best')
+    title('Estimation errors y')
+    xlabel ('Iteration');
+    ylabel ('[m]');
+
+    %
+    figure(12), clf;
+
+    errt = gt(:,4)' - th;
+    plot(1:1:length(gt),errt);
+    hold on
+    plot(1:1:length(gt),2*covt,'r');
+    hold on
+    plot(1:1:length(gt),-2*covt,'r');
+    hold on
+    plot(1:1:length(gt),3*covt,'g');
+    hold on
+    plot(1:1:length(gt),-3*covt,'g');
+
+    legend('Est. error theta','Est. covariance theta (97%)','','Est. covariance theta (99%)','Location','best')
+    title('Estimation errors theta')
+    xlabel ('Iteration');
+    ylabel ('[rad]');
 end
 
-radii1 = reader_circumferences(phase_measured1, Rmax, lamda);
-radii2 = reader_circumferences(phase_measured2, Rmax, lamda);
-radii3 = reader_circumferences(phase_measured3, Rmax, lamda);
-radii4 = reader_circumferences(phase_measured4, Rmax, lamda);
-radii = {radii1, radii2, radii3};  % Use curly braces to create a cell array
-
-points_cloud1 = circumferences_interceptions(radii1, radii2, reader1, reader2);
-points_cloud2 = circumferences_interceptions(radii1, radii3, reader1, reader3);
-points_cloud3 = circumferences_interceptions(radii2, radii3, reader2, reader3);
-points_cloud4 = circumferences_interceptions(radii1, radii4, reader1, reader4);
-points_clouds = {points_cloud1, points_cloud2, points_cloud3};  % Use curly braces to create a cell array
-
-
-plot_circumferences=true;
-window=[-70,70];
-plot_tag=true;
-
-plot_point_cloud(tag, readers, radii, points_clouds, plot_circumferences, window, plot_tag)
-
+% Saving the data
+if save_datas == true
+    main_save_map
+end
