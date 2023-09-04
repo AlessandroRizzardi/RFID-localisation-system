@@ -37,17 +37,19 @@ if GT
         covt(i) = cov_robot{i,1}(3,3);  
     end
     
-    plot(tag1.x(1),tag1.x(2),'*b','MarkerSize',10)
-    plot(tag2.x(1),tag2.x(2),'*b','MarkerSize',10)
-    plot(tag3.x(1),tag3.x(2),'*b','MarkerSize',10)
-    plot(tag4.x(1),tag4.x(2),'*b','MarkerSize',10)
-
+    % Plot the tags
+    for i = 1:length(tags)
+        tag = tags(i);
+        plot(tag.x(1),tag.x(2),'*b','MarkerSize',10)
+    end
+    
     plot(posx,posy,'-r')
-    legend('Ground truth','Estimated','Location','best')
+    legend('Ground truth','Tags','Estimated','Location','best')
     title('GT Vs. EST')
     xlabel ('x [m]');
     ylabel ('y [m]');
-    %
+    
+    
     figure(5),clf
     errx = gt(:,2)' - posx;
     plot(1:1:length(gt),errx)
@@ -110,9 +112,5 @@ if GT
     title('Estimation errors theta')
     xlabel ('Iteration');
     ylabel ('[rad]');
-end
-
-% Saving the data
-if save_datas == true
-    main_save_map
+    
 end

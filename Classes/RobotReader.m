@@ -74,8 +74,10 @@ methods
         x_next      = obj.x(1) + cos(obj.x(3)) * odometry.dx - sin(obj.x(3)) * (odometry.dy);
         y_next      = obj.x(2) + sin(obj.x(3)) * odometry.dx + cos(obj.x(3)) * (odometry.dy);
         theta_next  = obj.x(3) + odometry.dtheta;
+
+        obj.x(1:3)       = [x_next; y_next; theta_next];
         next_state  = [x_next; y_next; theta_next];
-        obj.x(1:3)       = next_state; 
+         
     end
 
     % In order to solve phase-ambuguity, we incorporate the two consecutive robot positions

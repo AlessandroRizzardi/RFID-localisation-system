@@ -35,14 +35,18 @@ P_est = robot.P;
 
 % the map we are considering is about on the x-axis from -5 to 10 and on the y-axis from -2 to 10
 
-% initializating the 4 RFID tags, the position is random
-tag1 = Tag([(10+5).*rand(1,1) - 5; (10+5).*rand(1,1) - 5;])
-tag2 = Tag([(10+5).*rand(1,1) - 5; (10+5).*rand(1,1) - 5;])
-tag3 = Tag([(10+5).*rand(1,1) - 5; (10+5).*rand(1,1) - 5;])
-tag4 = Tag([(10+5).*rand(1,1) - 5; (10+5).*rand(1,1) - 5;])
+% initializating 30 RFID tags, the position is random
+%tag1 = Tag([-3; 9]);
+%tag2 = Tag([8; 9]);
+%tag3 = Tag([-3; -2]);
+%tag4 = Tag([8; -2]);
 
-num_tags = 4;
-RFIDsystem = RFIDreadings([tag1; tag2; tag3; tag4], num_tags);
+num_tags = 5;
+for i = 1:num_tags
+  tags(i) = Tag([(10+5).*rand(1,1) - 5; (10+5).*rand(1,1) - 5;]);
+end
+
+RFIDsystem = RFIDreadings(tags, num_tags);
 
 T_limit = N_odometries;
 
@@ -62,32 +66,40 @@ for k = 1:T_limit
   % KF Prediction ------------------------------------------------------
   fprintf('Prediction...');
   x_est(1:3) = robot.update_state_robot(odometries{k});
+
   P_est = A*P_est*A' + B*Q*B';
   fprintf('Done!\n');
 
   % update state space
   x_est(4:6) = robot.x(4:6);
-  %robot_old = robot;
 
   robot.P = P_est;
 
   % KF update -----------------------------------------------------------
   fprintf('Update...');
 
-  robot_act = RobotReader();
+  h_meas = zeros(num_tags, 1);
+  for i = 1:num_tags
+    tag = RFIDsystem.tags_vector(i);
 
-  if k == 1
-    robot_act.x = [gt(1,2); gt(1,3); gt(1,4); gt(1,2); gt(1,3); gt(1,4)];
-  else
-    robot_act.x = [gt(k,2); gt(k,3); gt(k,4); gt(k-1,2); gt(k-1,3); gt(k-1,4)];
+    if k == 1
+      d_act = tag.compute_distance([gt(1,2); gt(1,3)]);
+      d_old = tag.compute_distance([gt(1,2); gt(1,3)]);
+    else
+      d_act = tag.compute_distance([gt(k,2); gt(k,3)]);
+      d_old = tag.compute_distance([gt(k-1,2); gt(k-1,3)]);
+    end
+
+    distance_meas_act = distance_measured(d_act,lambda);
+    distance_meas_old = distance_measured(d_old,lambda);
+
+    h_meas(i) = distance_meas_act - distance_meas_old;
   end
 
   [h,H] = robot.measurement_function(RFIDsystem.tags_vector, RFIDsystem.num_tags);
 
-  [h_actual, ~] = robot_act.measurement_function(RFIDsystem.tags_vector, RFIDsystem.num_tags);
-  
   K = P_est*H'*inv(H*P_est*H' + RFIDsystem.R);
-  x_est = x_est + K*(h_actual - h);
+  x_est = x_est + K*(h_meas - h);
   P_est = (eye(6) - K*H)*P_est;
 
 

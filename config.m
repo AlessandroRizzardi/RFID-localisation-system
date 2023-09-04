@@ -35,7 +35,11 @@ plot_figure = false; % to plot the incremental map
 % |  _ < (_) | |_) | (_) | |_ 
 % |_| \_\___/|_.__/ \___/ \__|
 %                             
-                                                 
+
+f = 865.7*10^6; % [Hz] frequency of the reader
+c = 3*10^8; % [m/s] speed of light
+lambda = c/f; % [m] wavelength
+
 
 %   ___      _                      _              
 % / _ \  __| | ___  _ __ ___   ___| |_ _ __ _   _ 
