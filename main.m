@@ -1,5 +1,5 @@
 %% Initialization2  
-% close all;
+close all;
 clear;  
 clc;
 
@@ -23,7 +23,7 @@ EKF
 %% Ground truth comparison
 if GT
 
-    figure(10),clf, hold on;
+    figure(1),clf, hold on;
     plot(gt(:,2),gt(:,3),'-k');
     
     for i = 1:length(pos_robot)
@@ -44,13 +44,13 @@ if GT
     end
     
     plot(posx,posy,'-r')
-    legend('Ground truth','Tags','Estimated','Location','best')
+    %legend('Ground truth','Tags','Estimated','Location','best')
     title('GT Vs. EST')
     xlabel ('x [m]');
     ylabel ('y [m]');
     
     
-    figure(5),clf
+    figure(2),clf
     errx = gt(:,2)' - posx;
     plot(1:1:length(gt),errx)
     hold on
@@ -62,7 +62,7 @@ if GT
     ylabel ('[m]');
 
     %
-    figure(6), clf;
+    figure(3), clf;
     plot(1:1:length(gt),errx)
     hold on
     plot(1:1:length(gt),2*covx,'r');

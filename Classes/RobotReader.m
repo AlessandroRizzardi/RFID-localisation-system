@@ -10,8 +10,6 @@ classdef RobotReader < handle
 properties
     x;          % current estimated position of the robot. Is a 3x1 vector of the form
                 %       [x; y; theta]       x, y [m], theta [rad]
-                % but it is extended to a 6x1 vector in order to solve phase ambiguity
-                %       [x; y; theta; x_old; y_old; theta_old]
     P;          % 6x6 covariance matrix of the state space of the system
 end % properties
 
@@ -24,31 +22,24 @@ end % properties
 methods 
 
     function obj = RobotReader() % constructor
-        obj.x = zeros(6, 1);
-        obj.P = zeros(6, 6);
+        obj.x = zeros(3, 1);
+        obj.P = zeros(3, 3);
     end
     
 
     % Given a odometry measurement, update the robot position estimate and it's covariance
-    
-    % Given the current state X_curr of the robot, it computes the updated state X_next based on the
-    % odometry dX. It's also able to return the jacobian of such transformation.
-    % Based on the update function X_next = f(X_curr, dX) described as
-    %       x_next     = x_curr + cos(theta_curr) * (dx + noise_x) - sin(theta_curr) * (dy + noise_y)
-    %       y_next     = y_curr + sin(theta_curr) * (dx + noise_x) + cos(theta_curr) * (dy + noise_y)
-    %       theta_next = theta_curr + dtheta + noise_theta
-    % that can be rewritten in a form X_next = X_curr + [R]*dX, where [R] is the rotation matrix
+    % v and omega are the input variables of the robot
 
     % We compute the jacobian of the dynamic model function w.r.t. the robot state X_curr = [x_curr, y_curr, theta_curr]
     % and the jacobian of the dynamic model function w.r.t. the perturbation 
-    function jac_x = JF_x(obj,odometries) 
+    function jac_x = JF_x(obj,odometries, inputs) 
+
+        v = inputs(1);
+        omega = inputs(2);
 
         x_curr = obj.x(1);
         y_curr = obj.x(2);
         theta_curr = obj.x(3);
-        
-        odx = odometries.dx;
-        ody = odometries.dy;
 
         jac_x    = [1,  0, - sin(theta_curr) * (odx) - cos(theta_curr) * (ody), 0, 0, 0; ...
                     0,  1,   cos(theta_curr) * (odx) - sin(theta_curr) * (ody), 0, 0, 0; ...
@@ -69,14 +60,30 @@ methods
                     0,           0,          0  ];
     end
    
-    
-    function next_state = update_state_robot(obj, odometry)
-        x_next      = obj.x(1) + cos(obj.x(3)) * odometry.dx - sin(obj.x(3)) * (odometry.dy);
-        y_next      = obj.x(2) + sin(obj.x(3)) * odometry.dx + cos(obj.x(3)) * (odometry.dy);
-        theta_next  = obj.x(3) + odometry.dtheta;
+    % Given a odometry measurement, update the robot position estimate 
+    % Assuming that the RFID readings are measured with period Ts and that the command variable v and ω 
+    % are approximately constant throughout the sampling period, it is possible to find the following discrete 
+    % time Zero-order-Hold equivalent dynamics
+    function next_state = update_state_robot(obj, inputs)
+        v = inputs(1);
+        omega = inputs(2);
 
-        obj.x(1:3)       = [x_next; y_next; theta_next];
-        next_state  = [x_next; y_next; theta_next];
+        x_curr = obj.x(1);
+        y_curr = obj.x(2);
+        theta_curr = obj.x(3);
+        
+        if omega == 0
+            x_next = x_curr + v * Ts* cos(theta_curr);
+            y_next = y_curr + v * Ts* sin(theta_curr);
+        else
+            x_next = x_curr + (2 * (v/omega) * sin(omega * Ts / 2) * cos(theta_curr + omega * Ts / 2) );
+            y_next = y_curr + (2 * (v/omega) * sin(omega * Ts / 2) * sin(theta_curr + omega * Ts / 2) );
+        end
+    
+        theta_next = theta_curr + omega * Ts;
+
+        obj.x       = [x_next; y_next; theta_next];
+        next_state  = obj.x; 
          
     end
 
