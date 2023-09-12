@@ -13,14 +13,14 @@ config
 
 robot = RobotReader([0,0,0]);
 
-T_sim = 100;
+T_sim = 30;
 
 % given a point to reach in the map the robot will move towards it, when it reaches it (check every iteration), another point is
 % generated randomly and the robot moves towards it again
 % the robot will move in a straight line towards the point, with a costant linear velocity
 
 % generate random first point in the map that needs to be in the map 15x15
-point = [randi([0,30]),randi([0,30])];
+%point = [randi([-5,5]),randi([-5,5])];
 vector_points = [point];
 
 % set the velocity of the robot
@@ -46,7 +46,7 @@ for i = 2:Ts:T_sim
 
     point_reached = robot.reached_point(point);
     if point_reached == true
-        point = [randi([0,30]),randi([0,30])];
+        point = [randi([-5,5]),randi([-5,5])];
         omega = robot.compute_angular_velocity(point, Ts);
         vector_points = [vector_points;point];
     end
@@ -60,8 +60,8 @@ plot(vector_points(:,1),vector_points(:,2),'*b','MarkerSize',10)
 plot(pos_robot_x,pos_robot_y,'-r')
 legend('Points','Robot','Location','best')
 title('Robot trajectory')
-xlim([0,30])
-ylim([0,30])
+xlim([-5,5])
+ylim([-5,5])
 
 
 %{
