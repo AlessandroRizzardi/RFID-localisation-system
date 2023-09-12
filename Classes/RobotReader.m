@@ -75,20 +75,10 @@ methods
         x_curr = obj.x(1);
         y_curr = obj.x(2);
         theta_curr = obj.x(3);
-        
-        if omega == 0
-            x_next = x_curr + v * Ts * cos(theta_curr);
-            y_next = y_curr + v * Ts * sin(theta_curr);
-        else
-            x_next = x_curr +  v * Ts * cos(omega * Ts);
-            y_next = y_curr +  v * Ts * sin(omega * Ts);
-        end
-        
-        if omega == 0
-            theta_next = theta_curr;
-        else
-            theta_next = omega*Ts;
-        end
+
+        x_next = x_curr + v * Ts * cos(theta_curr + omega * Ts);
+        y_next = y_curr + v * Ts * sin(theta_curr + omega * Ts);
+        theta_next = theta_curr + omega*Ts;
      
         obj.x       = [x_next; y_next; theta_next];
         next_state  = obj.x; 
@@ -101,7 +91,7 @@ methods
     function omega = compute_angular_velocity(obj, point, Ts)
         x_robot = obj.x(1);
         y_robot = obj.x(2);
-        theta = atan2(point(2) - y_robot, point(1) - x_robot);
+        theta = atan2(point(2) - y_robot, point(1) - x_robot) - obj.x(3);
         omega = theta/Ts;
     end
 
