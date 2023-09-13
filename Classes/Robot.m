@@ -1,4 +1,4 @@
-classdef RobotReader < handle 
+classdef Robot < handle 
 
 
 %     _   _   _        _ _           _            
@@ -21,7 +21,7 @@ end % properties
 %                                                                                                           
 methods 
 
-    function obj = RobotReader(initial_state) % constructor
+    function obj = Robot(initial_state) % constructor
         obj.x = zeros(3, 1);
         obj.x(1) = initial_state(1);
         obj.x(2) = initial_state(2);
