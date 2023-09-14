@@ -1,4 +1,4 @@
-classdef DifferentialDrive < handle 
+classdef DifferentialDriveRobot < handle 
 
 %     _   _   _        _ _           _            
 %    / \ | |_| |_ _ __(_) |__  _   _| |_ ___  ___ 
@@ -27,7 +27,7 @@ end % properties
 % here we firstly define the functions that are intended to be called in the main program                                                                                                                   
 methods 
 
-    function obj = DifferentialDrive(initlal_state,R,L) % constructor
+    function obj = DifferentialDriveRobot(initial_state,R,L) % constructor
         obj.x = zeros(3,1);
         obj.x(1) = initial_state(1);
         obj.x(2) = initial_state(2)
@@ -47,19 +47,19 @@ methods
         x_next = obj.x; 
     end
 
-    function u_est,omega_est = odometry(obj,v,w,dt)
+    function [u_est,omega_est] = odometry(obj,v,w,dt)
         vR,vL = vwTovv(v,w);
 
         % angles measured by encoders
         phiR = vR*dt + normrand(0,0.1);   
         phiL = vL*dt + normrand(0,0.1);
 
-        u_est = obj.R*(phiR + phiL)/2
-        omega_est = obj.R*(phiR - phiL)/(2*obj.L)
+        u_est = obj.R*(phiR + phiL)/2;
+        omega_est = obj.R*(phiR - phiL)/(2*obj.L);
 
         obj.x_est(1) = obj.x_est(1) + u_est*cos(obj.x_est(3)); 
         obj.x_est(2) = obj.x_est(2) + u_est*sin(obj.x_est(3)); 
-        obj.x_est(3) = obj.x_est(3) + omega_est
+        obj.x_est(3) = obj.x_est(3) + omega_est;
     end
 
 %  ____       _            _         __  __                _                   
@@ -69,14 +69,14 @@ methods
 % |_|   |_|  |_| \_/ \__,_|\__\___| |_|  |_|\___|_| |_| |_|_.__/ \___|_|  |___/
 %
 % Here are defined auxiliary functions used in the public members or for other simpler computations
-    function vR,vL = vwTovv(obj,v,w) % switch from v, omega to vR,vL
+    function [vR,vL] = vwTovv(obj,v,w) % switch from v, omega to vR,vL
         vR = (v + obj.L*w)/obj.R;
         vL = (v - obj.L*w)/obj.R;       
     end
 
-    function v,w = vvTovw(obj,vR,vL)    %switch from vR.vL to v, omega
+    function [v,w] = vvTovw(obj,vR,vL)    %switch from vR.vL to v, omega
         v = obj.R*(vR+vL)/2;
-        omega = obj.R*(vR-vL)/2;
+        w = obj.R*(vR-vL)/2;
     end
 
 
