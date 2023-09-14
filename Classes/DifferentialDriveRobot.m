@@ -30,8 +30,8 @@ methods
     function obj = DifferentialDriveRobot(initial_state,R,L) % constructor
         obj.x = zeros(3,1);
         obj.x(1) = initial_state(1);
-        obj.x(2) = initial_state(2)
-        obj.x(3) = initial_state(3)
+        obj.x(2) = initial_state(2);
+        obj.x(3) = initial_state(3);
 
         obj.R = R;
         obj.L = L;
@@ -62,6 +62,29 @@ methods
         obj.x_est(3) = obj.x_est(3) + omega_est;
     end
 
+    function inRange = inTagRange(tag_position, max_range)
+        dist = getTagDistance(tag_position);
+
+        if dist <= max_range
+            inRange = true;
+        else 
+            inRange = false;
+        end
+    end
+
+    function phase_measured = phaseMeasured(tag_position, lambda , noise)
+        distance = getTagDistance(tag_position);
+       
+        phase = (distance * 4 * pi)/lambda;
+
+        if noise == true
+            phase_measured = mod(phase, 2*pi) + 0.1 * normrnd(0,1);
+        else
+            phase_measured = mod(phase, 2*pi);
+        end
+
+    end
+
 %  ____       _            _         __  __                _                   
 % |  _ \ _ __(_)_   ____ _| |_ ___  |  \/  | ___ _ __ ___ | |__   ___ _ __ ___ 
 % | |_) | '__| \ \ / / _` | __/ _ \ | |\/| |/ _ \ '_ ` _ \| '_ \ / _ \ '__/ __|
@@ -79,6 +102,15 @@ methods
         w = obj.R*(vR-vL)/2;
     end
 
+    function distance = getTagDistance(obj,tag_position)
+        x_tag =  tag_position(1);
+        y_tag = tag_position(2);
+        distance = sqrt((obj.x(1) - x_tag)^2 + (obj.x(2) - y_tag)^2);
+        
+    end
+
 
 end % methods
-end 
+
+end % DifferentialDriveRobot class
+
