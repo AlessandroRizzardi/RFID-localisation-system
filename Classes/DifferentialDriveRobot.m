@@ -14,6 +14,8 @@ classdef DifferentialDriveRobot < handle
 
         L;  % half of the distance between the 2 wheels [m]
         R;  % radius of the wheel [m]
+        KL;
+        KR;
 
     end % properties
 
@@ -27,7 +29,7 @@ classdef DifferentialDriveRobot < handle
     % here we firstly define the functions that are intended to be called in the main program                                                                                                                   
     methods 
 
-        function obj = DifferentialDriveRobot(initial_state,R,L) % constructor
+        function obj = DifferentialDriveRobot(initial_state, R, L, KR, KL) % constructor
             obj.x = zeros(3,1);
             obj.x(1) = initial_state(1);
             obj.x(2) = initial_state(2);
@@ -35,11 +37,20 @@ classdef DifferentialDriveRobot < handle
 
             obj.R = R;
             obj.L = L;
+            obj.KR = KR;
+            obj.KL = KL;
 
         end
 
-        function x_next = dynamics(obj,vL,vR,dt)
-            v,w = vvTovw(vL,vR);
+        function state = get_state(obj)
+            state = obj.x;
+        end
+
+        function state_odometry = get_odometry_state(obj)
+            state_odometry = obj.x_est;
+        end
+
+        function x_next = dynamics(obj,v,w,dt)
             obj.x(1) = obj.x(1) + v*cos(obj(3))*dt;
             obj.x(2) = obj.x(2) + v*sin(obj(3))*dt;
             obj.x(3) = obj.x(3) + w*dt;
@@ -47,8 +58,8 @@ classdef DifferentialDriveRobot < handle
             x_next = obj.x; 
         end
 
-        function [u_est,omega_est] = odometry(obj,v,w,dt)
-            vR,vL = vwTovv(v,w);
+        function odometry_estimation = odometry(obj,v,w,dt)
+            vR,vL = obj.vwTovv(v,w);
 
             % angles measured by encoders
             phiR = vR*dt + normrand(0,0.1);   
@@ -60,10 +71,16 @@ classdef DifferentialDriveRobot < handle
             obj.x_est(1) = obj.x_est(1) + u_est*cos(obj.x_est(3)); 
             obj.x_est(2) = obj.x_est(2) + u_est*sin(obj.x_est(3)); 
             obj.x_est(3) = obj.x_est(3) + omega_est;
+
+            uR = obj.R*phiR;
+            uL = obj.R*phiL;
+            Q = [obj.KR * abs(uR) , 0 ; 0, obj.KL*abs(uL)];
+
+            odometry_estimation = {[u_est,omega_est],Q};
         end
 
         function inRange = inTagRange(tag_position, max_range)
-            dist = getTagDistance(tag_position);
+            dist = obj.getTagDistance(tag_position);
 
             if dist <= max_range
                 inRange = true;
@@ -73,7 +90,7 @@ classdef DifferentialDriveRobot < handle
         end
 
         function phase_measured = phaseMeasured(tag_position, lambda , noise)
-            distance = getTagDistance(tag_position);
+            distance = obj.getTagDistance(tag_position);
         
             phase = (distance * 4 * pi)/lambda;
 
