@@ -58,7 +58,8 @@ classdef DifferentialDriveRobot < handle
             x_next = obj.x; 
         end
 
-        function odometry_estimation = odometry(obj,v,w,dt)
+        
+        function odometry_estimation = odometry_step(obj,v,w,dt)
             vR,vL = obj.vwTovv(v,w);
 
             % angles measured by encoders
@@ -76,7 +77,7 @@ classdef DifferentialDriveRobot < handle
             uL = obj.R*phiL;
             Q = [obj.KR * abs(uR) , 0 ; 0, obj.KL*abs(uL)];
 
-            odometry_estimation = {[u_est,omega_est],Q};
+            odometry_estimation = {[u_est,omega_est],Q}; 
         end
 
         function inRange = inTagRange(tag_position, max_range)
