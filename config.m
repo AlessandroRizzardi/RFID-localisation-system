@@ -1,53 +1,30 @@
 % This files contains all the parameters used while running the SLAM algorithms
 
 
-% 
-%  __  __       _          ___     _                    _       _       _        
-% |  \/  | __ _(_)_ __    ( _ )   | |    ___   __ _  __| |   __| | __ _| |_ __ _ 
-% | |\/| |/ _` | | '_ \   / _ \/\ | |   / _ \ / _` |/ _` |  / _` |/ _` | __/ _` |
-% | |  | | (_| | | | | | | (_>  < | |__| (_) | (_| | (_| | | (_| | (_| | || (_| |
-% |_|  |_|\__,_|_|_| |_|  \___/\/ |_____\___/ \__,_|\__,_|  \__,_|\__,_|\__\__,_|
-%                                                                                
-
-load_precomputed_data = true; % Use precomputed features                  
-GT = true; % Compare the grand truth
-
-select_odometries = 'simul_ODO_1.txt';
-select_odo_times = 'simul_ODO_times_1.txt';
-select_GT = 'simul_GT_1.txt';
-save_datas = true;
-
-Ts = 0.2; % Sampling time [s]
+Tf = 100; % Total time [s]
+Ts = 0.01; % Sampling time [s]
 
 
-%   _____ _     __ 
-%  | ____| | __/ _|
-%  |  _| | |/ / |_ 
-%  | |___|   <|  _|
-%  |_____|_|\_\_|  
-%   
-min_distance_features = 0.8; % If 2 features are closer then they are collapsed into only one
-plot_figure = false; % to plot the incremental map
-
-%  ____       _           _   
-% |  _ \ ___ | |__   ___ | |_ 
-% | |_) / _ \| '_ \ / _ \| __|
-% |  _ < (_) | |_) | (_) | |_ 
-% |_| \_\___/|_.__/ \___/ \__|
-%                             
-
-f = 865.7*10^6; % [Hz] frequency of the reader
-c = 3*10^8; % [m/s] speed of light
+f = 867*10^6; % [Hz] frequency of the reader
+c =   3*10^8; % [m/s] speed of light
 lambda = c/f; % [m] wavelength
 
+Ns = 50; % number of precedent steps used in MHEKF
 
-%   ___      _                      _              
-% / _ \  __| | ___  _ __ ___   ___| |_ _ __ _   _ 
-% | | | |/ _` |/ _ \| '_ ` _ \ / _ \ __| '__| | | |
-% | |_| | (_| | (_) | | | | | |  __/ |_| |  | |_| |
-%  \___/ \__,_|\___/|_| |_| |_|\___|\__|_|   \__, |
-%                                           |___/ 
-%
+max_range = 5; % [m] maximum range of the reader
+nM = ceil(max_range/(lambda/2)); % number of measurements
 
-               
 
+L = 1;   % [m] half of the distance between the 2 wheels
+R = 0.1; % [m] radius of the wheels
+
+KL = 0.01*10^-2; % noise parameters of odometry
+KR = 0.01*10^-2;
+
+sigma_phi = 0.2; % [rad] standard deviation of the angle measurement
+
+c1 = 0.0005; % parameter for computing weight of each instance
+c2 = 0.0001; % parameter for computing weight of each instance
+
+Kp_v = 0.01; % parameters for the controller
+Kp_w = 0.01;

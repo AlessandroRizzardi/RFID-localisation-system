@@ -47,11 +47,11 @@ methods
     end
     
     % function that computes the prediction step of the filter
-    function EKF_instance_est = EKF_predict(obj, l, lambda, sigma_phi, encoder_readings, d) % constructor
+    function EKF_instance_est = EKF_predict(obj, encoder_readings, d) % constructor
         % initialize cell array encoder readings
 
         u = encoder_readings{1,1}(1);
-        v = encoder_readings{1,1}(2);
+        omega = encoder_readings{1,1}(2);
         Q = encoder_readings{2,1};
 
         ro_curr = obj.x(1);
@@ -95,10 +95,15 @@ methods
         K_gain = zeros(2,1);
         K_gain = P_curr*H'/(H*P_curr*H' + R);
 
-        phi_expected = mod(-2*K*ro_curr,2*pi)
+        phi_expected = mod(-2*K*ro_curr,2*pi);
 
-        [ro_next;beta_next] = [ro_curr;beta_curr] + K_gain*(phi_meas - phi_expected);
+        x_next = zeros(2,1);
+        x_next = [ro_curr;beta_curr] + K_gain*(phi_meas - phi_expected);
+
         P_next = (eye(2) - K*H)*P_curr;
+
+        ro_next = x_next(1);
+        beta_next = x_next(2);
 
         EKF_instance_est{1,1} = [ro_next;beta_next];
         EKF_instance_est{2,1} = P_next;

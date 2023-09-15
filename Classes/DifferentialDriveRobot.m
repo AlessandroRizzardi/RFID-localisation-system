@@ -35,6 +35,8 @@ classdef DifferentialDriveRobot < handle
             obj.x(2) = initial_state(2);
             obj.x(3) = initial_state(3);
 
+            obj.x_est = zeros(3,1);
+
             obj.R = R;
             obj.L = L;
             obj.KR = KR;
@@ -63,8 +65,8 @@ classdef DifferentialDriveRobot < handle
             vR,vL = obj.vwTovv(v,w);
 
             % angles measured by encoders
-            phiR = vR*dt + normrand(0,0.1);   
-            phiL = vL*dt + normrand(0,0.1);
+            phiR = vR*dt + normrand(0,sqrt(obj.KR)/obj.R);   
+            phiL = vL*dt + normrand(0,sqrt(obj.KL)/obj.R);
 
             u_est = obj.R*(phiR + phiL)/2;
             omega_est = obj.R*(phiR - phiL)/(2*obj.L);
@@ -80,7 +82,7 @@ classdef DifferentialDriveRobot < handle
             odometry_estimation = {[u_est,omega_est],Q}; 
         end
 
-        function inRange = inTagRange(tag_position, max_range)
+        function inRange = inTagRange(obj,tag_position, max_range)
             dist = obj.getTagDistance(tag_position);
 
             if dist <= max_range
@@ -90,13 +92,13 @@ classdef DifferentialDriveRobot < handle
             end
         end
 
-        function phase_measured = phaseMeasured(tag_position, lambda , noise)
+        function phase_measured = phaseMeasured(obj, tag_position, lambda , noise, sigma_phi)
             distance = obj.getTagDistance(tag_position);
         
             phase = (distance * 4 * pi)/lambda;
 
             if noise == true
-                phase_measured = mod(phase, 2*pi) + 0.1 * normrnd(0,1);
+                phase_measured = mod(phase, 2*pi) + normrnd(0,sigma_phi^2);
             else
                 phase_measured = mod(phase, 2*pi);
             end
