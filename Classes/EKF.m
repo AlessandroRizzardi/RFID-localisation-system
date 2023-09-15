@@ -92,12 +92,10 @@ methods
 
         H = [-2*K, 0];
         
-        K_gain = zeros(2,1);
         K_gain = P_curr*H'/(H*P_curr*H' + R);
 
         phi_expected = mod(-2*K*ro_curr,2*pi);
 
-        x_next = zeros(2,1);
         x_next = [ro_curr;beta_curr] + K_gain*(phi_meas - phi_expected);
 
         P_next = (eye(2) - K*H)*P_curr;

@@ -24,12 +24,16 @@ EKF_instances = cell{nM,1};
 
 steps_in_range = 0;
 
-N = floor((Tf-1)/Ts);  %number of steps --> per la creazione delle histories altrimenti non saprei come fare
+state_history = {}; % state of EKF
+dynamics_history = {}; 
+odometry_history = {}; 
+phase_history = [];
 
-state_history = cell(N,3); % state of EKF
-odometry_history = cell(N,3); 
-phase_history = cell(N);
-weights = zeros(N);
+weights_tmp = zeros(nM,1);
+weights = zeros(nM,1);
+weights_prev = 10^-6*ones(nM,1);
+
+instance_selected = 0; %
 
 for k = 1:Ts:Tf
 
@@ -37,6 +41,7 @@ for k = 1:Ts:Tf
 
         inTagRange = true;
         phase_measured = robot.phaseMeasured(tag_position, lambda , true, sigma_phi);
+        phase_history(end+1,1) = phase_measured;
 
         % Initialize nM EKF instances (l = 1,2,...,nM)
         for l = 1:nM
@@ -47,25 +52,27 @@ for k = 1:Ts:Tf
         rho_est = EKF_instances{nM}.x(1);
         beta_est = EKF_instances{nM}.x(2);
 
+        state_history{end+1,1} = [rho_est;beta_est];
+
         [v,omega] = tag_pursuit_controller(Kp_v, Kp_w, rho_est,beta_est);
 
         x_next = robot.dynamics(v,omega,Ts);
+        dynamics_history{end+1,1} = x_next;
+
         odometry_estimation = robot.odometry_step(v,omega,Ts);
+        odometry_history{end+1,1} = odometry_estimation;
 
         steps_in_range = steps_in_range + 1;
    
-    elseif inTagRange == true && robot.inTagRange(tag_position, max_range) == true
+    elseif inTagRange == true && robot.inTagRange(tag_position, max_range) == true        % check if the robot is still in range of the tag
 
         phase_measured = robot.phaseMeasured(tag_position, lambda , true, sigma_phi);
 
-        % Prediction EKF
+        % Prediction and Correction EKF
         for l = 1:nM
-            EKF_instances{l} = EKF_instances{l}.EKF_prediction(odometry_estimation, L); % DA QUA
-        end
+            EKF_instances{l} = EKF_instances{l}.EKF_predict(odometry_estimation, L);
 
-        % Correction EKF
-        for l = 1:nM
-            EKF_instances{l} = EKF_instances{l}.EKF_correct(lambda, sigma_phi, phase_measured);    
+            EKF_instances{l} = EKF_instances{l}.EKF_correct(lambda, sigma_phi, phase_measured); 
         end
 
         % Correction of non-positive range estimation
@@ -76,15 +83,74 @@ for k = 1:Ts:Tf
             end
         end
 
-        % Weighting step
-        for l = 1:nm
-            weight_tmp = EKF_instances{l}.EKF_weight_tmp() 
+        if steps_in_range >= Ns
+            % Weighing Step
+            for l = 1:nM
+                weights_tmp(l) = EKF_instances{l}.EKF_weight_tmp(k, state_history, odometry_history, phase_history, Ns, weights_prev(l), c1, c2);
+            end
 
+            eta = compute_eta(weights_tmp);
+
+            for l = 1:nM
+                weights(l) = EKF_instances{l}.EKF_weight(weights_tmp, eta);
+            end
+
+            weights_prev = weights;
+
+            % Take as final estimates ρ^k and β^k the ones provided by the EKF instance with the largest weight
+            [~,instance_selected] = max(weights);
+
+            rho_est = EKF_instances{instance_selected}.x(1);
+            beta_est = EKF_instances{instance_selected}.x(2);
+
+            state_history{end+1,1} = [rho_est;beta_est];
+
+            [v,omega] = tag_pursuit_controller(Kp_v, Kp_w, rho_est,beta_est);
+
+            x_next = robot.dynamics(v,omega,Ts);
+            dynamics_history{end+1,1} = x_next;
+
+            odometry_estimation = robot.odometry_step(v,omega,Ts);
+            odometry_history{end+1,1} = odometry_estimation;
+
+            steps_in_range = steps_in_range + 1;
         end
+
+        % ---------------------- ATTENZIONE ----------------------
+        % else --> steps_in_range < Ns --> che facciamo???
+        
+        
+    elseif inTagRange == true && robot.inTagRange(tag_position, max_range) == false        % check if the robot is out of range of the tag
+        
+        % Reset everything
+        
+        inTagRange =false;
+        EKF_instances = cell{nM,1};
+
+        steps_in_range = 0;
+
+        state_history = {}; % state of EKF
+        dynamics_history = {}; 
+        odometry_history = {}; 
+        phase_history = [];
+
+        weights_tmp = zeros(nM,1);
+        weights = zeros(nM,1);
+        weights_prev = 10^-6*ones(nM,1);
+
+        instance_selected = 0; %
+
+        [v,omega] = pure_pursuit_controller(Kp_v,Kp_w,target_point(1),target_point(2),robot.get_odometry_state());
+
+        x_next = robot.dynamics(v,omega,Ts);
+        dynamics_history{end+1,1} = x_next;
+
+        odometry_estimation = robot.odometry_step(v,omega,Ts);
+        odometry_history{end+1,1} = odometry_estimation;
 
     end
 
-    [v,omega] = pure_pursuit_controller(Kp_v,Kp_w,target_point(1),target_point(2),robot.get_odometry_state());
+    
 
 
 
