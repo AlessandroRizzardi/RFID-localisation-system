@@ -24,6 +24,13 @@ EKF_instances = cell{nM,1};
 
 steps_in_range = 0;
 
+N = floor((Tf-1)/Ts);  %number of steps --> per la creazione delle histories altrimenti non saprei come fare
+
+state_history = cell(N,3); % state of EKF
+odometry_history = cell(N,3); 
+phase_history = cell(N);
+weights = zeros(N);
+
 for k = 1:Ts:Tf
 
     if inTagRange == false && robot.inTagRange(tag_position, max_range) == true        % check if it is the first time the phase measurement is available
@@ -53,7 +60,26 @@ for k = 1:Ts:Tf
 
         % Prediction EKF
         for l = 1:nM
-            EKF_instances{l} = EKF_instances{l}.EKF_prediction(odometry_estimation, L);
+            EKF_instances{l} = EKF_instances{l}.EKF_prediction(odometry_estimation, L); % DA QUA
+        end
+
+        % Correction EKF
+        for l = 1:nM
+            EKF_instances{l} = EKF_instances{l}.EKF_correct(lambda, sigma_phi, phase_measured);    
+        end
+
+        % Correction of non-positive range estimation
+        for l = 1:nM
+            if EKF_instances{l}.x(1) <= 0
+                EKF_instances{l}.x(1) = max(abs(EKF_instance{l}.x(1)),10^-6);
+                EKF_instances{l}.x(2) = EKF_instances{l}.x(2) + pi;
+            end
+        end
+
+        % Weighting step
+        for l = 1:nm
+            weight_tmp = EKF_instances{l}.EKF_weight_tmp() 
+
         end
 
     end

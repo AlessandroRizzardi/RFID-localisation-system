@@ -80,7 +80,7 @@ methods
     end
 
     % function that computes the correction step of the filter
-    function EKF_instance_est = EKF_correct(obj, l, lambda, sigma_phi, phi_meas) % constructor
+    function EKF_instance_est = EKF_correct(obj, lambda, sigma_phi, phi_meas) % constructor
         
         ro_curr = obj.x(1);
         beta_curr = obj.x(2);
