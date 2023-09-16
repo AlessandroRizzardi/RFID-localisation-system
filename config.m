@@ -1,13 +1,15 @@
 % This files contains all the parameters used while running the SLAM algorithms
 
 
-Tf = 100; % Total time [s]
-Ts = 0.01; % Sampling time [s]
+Tf = 1000; % Total time [s]
+Ts = 1; % Sampling time [s]
 
 
 f = 867*10^6; % [Hz] frequency of the reader
 c =   3*10^8; % [m/s] speed of light
 lambda = c/f; % [m] wavelength
+
+K = 2*pi/lambda;
 
 Ns = 50; % number of precedent steps used in MHEKF
 
@@ -15,7 +17,7 @@ max_range = 5; % [m] maximum range of the reader
 nM = ceil(max_range/(lambda/2)); % number of measurements
 
 
-L = 1;   % [m] half of the distance between the 2 wheels
+d = 1;   % [m] distance between the 2 wheels
 R = 0.1; % [m] radius of the wheels
 
 KL = 0.01*10^-2; % noise parameters of odometry

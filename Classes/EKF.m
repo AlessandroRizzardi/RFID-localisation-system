@@ -33,6 +33,8 @@ methods
     % z0 is the measurement at time 0
     function EKF_instance = EKF_init(obj,phi_0, l, lambda, sigma_phi) % constructor
         
+        
+        
         K = (2*pi)/lambda;
         ro_0 = -phi_0/(2*K) + (l*lambda)/2;
         beta_0 = 0;
@@ -52,7 +54,7 @@ methods
 
         u = encoder_readings{1,1}(1);
         omega = encoder_readings{1,1}(2);
-        Q = encoder_readings{2,1};
+        Q = encoder_readings{1,2};
 
         ro_curr = obj.x(1);
         beta_curr = obj.x(2);
@@ -80,13 +82,11 @@ methods
     end
 
     % function that computes the correction step of the filter
-    function EKF_instance_est = EKF_correct(obj, lambda, sigma_phi, phi_meas) % constructor
+    function EKF_instance_est = EKF_correct(obj, K, sigma_phi, phi_meas) % constructor
         
         ro_curr = obj.x(1);
         beta_curr = obj.x(2);
         P_curr = obj.P;
-
-        K = (2*pi)/lambda;
 
         R = sigma_phi^2;
 
@@ -114,22 +114,15 @@ methods
     % considering the phase measurements collected over a time window comprising the last Ns = 50 steps
     % 1) the movement of the tag position estimate in the last Ns steps (metric M1 );
     % 2) the agreement of the tag position estimate with the last Ns measurements (metric M2 ).
-    function weight_tmp = EKF_weight_tmp(obj, k, state_history, odometry_history, phase_history, Ns, weight_prec, c1, c2)
-
-        ro_hist = state_history{1,1};
-        beta_hist = state_history{2,1};
-
-        x_robot_hist = odometry_history{1,1};
-        y_robot_hist = odometry_history{2,1};
-        theta_robot_hist = odometry_history{3,1};
+    function weight_tmp = EKF_weight_tmp(obj, j, state_history, odometry_history, phase_history, Ns, weight_prec, c1, c2, K)
 
         sum_phase_diff = 0;
 
-        for i = (k-Ns+1) : k
-            x_tag(i) =  x_robot_hist(i) + ro_hist(i)*cos(theta_robot_hist(i) - beta_hist(i));
-            y_tag(i) =  y_robot_hist(i) + ro_hist(i)*sin(theta_robot_hist(i) - beta_hist(i));
+        for i = (j-Ns) : j-1
+            x_tag(i) =  odometry_history{i,1}(1) + state_history{i,1}(1)*cos(odometry_history{i,1}(3) - state_history{i,1}(2));
+            y_tag(i) =  odometry_history{i,1}(2) + state_history{i,1}(1)*sin(odometry_history{i,1}(3) - state_history{i,1}(2));
 
-            if i == (k-Ns+1)
+            if i == (j-Ns)
                 x_min_tag = x_tag(i);
                 y_min_tag = y_tag(i);
                 x_max_tag = x_tag(i);
@@ -149,7 +142,7 @@ methods
                 y_max_tag = y_tag(i);
             end
 
-            D = sqrt((x_robot_hist(i) - x_tag(i))^2 + (y_robot_hist(i) - y_tag(i))^2);
+            D = sqrt((odometry_history{i,1}(1) - x_tag(i))^2 + (odometry_history{i,1}(2) - y_tag(i))^2);
             phi_expected = mod(-2*K*D,2*pi);
 
             phase_diff = (phase_history(i) - phi_expected)^2;
