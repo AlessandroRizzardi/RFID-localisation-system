@@ -1,8 +1,9 @@
 % This files contains all the parameters used while running the SLAM algorithms
 
 
-Tf = 1000; % Total time [s]
-Ts = 1; % Sampling time [s]
+Tf = 60; % Total time [s]
+%Ts = 1; % Sampling time [s]
+dt = 10^-3; % integration-scheme timestep
 
 
 f = 867*10^6; % [Hz] frequency of the reader
@@ -28,5 +29,5 @@ sigma_phi = 0.2; % [rad] standard deviation of the angle measurement
 c1 = 0.0005; % parameter for computing weight of each instance
 c2 = 0.0001; % parameter for computing weight of each instance
 
-Kp_v = 0.01; % parameters for the controller
-Kp_w = 0.01;
+Kp_v = 0.5; % proportional parameters for PID the controller
+Kp_w = 2;

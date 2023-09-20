@@ -13,15 +13,17 @@ config
 % Initialize the robot
 robot = DifferentialDriveRobot([0;0;0],R,d,KR,KL,dt);
 
-Tf = 5; % simulation time
-steps = floor(Tf/robot.dt);
+steps = 10000;
 
 % Define position of the target randomly with x and y between -8 and 8
-target_point = [4;4];
+target_point = [5;5];
 
 points_vector = [];
 points_vector(1,1) = target_point(1);
 points_vector(1,2) = target_point(2);
+
+Tf = 180; % simulation time
+steps = 
 
 
 for i=1:steps
@@ -31,9 +33,9 @@ for i=1:steps
     if distance < 0.5
         target_point = rand(2,1)*16-8;
         points_vector(end+1,:) = [target_point(1),target_point(2)];
-        [v,dtheta] = greedy_controller(Kp_v, Kp_w, target_point(1),target_point(2),robot.x_est);
+        [v,dtheta] = greedy_controller(Kp_v, target_point(1),target_point(2),robot.x);
     else
-        [v,dtheta] = greedy_controller(Kp_v,Kp_w, target_point(1),target_point(2),robot.x_est);
+        [v,dtheta] = greedy_controller(Kp_v, target_point(1),target_point(2),robot.x);
     end
 
     x_next = robot.dynamics(v,dtheta);
@@ -66,7 +68,7 @@ plot(x_dynamics,y_dynamics,'r')
 hold on
 plot(points_vector(:,1),points_vector(:,2),'g*','MarkerSize',10)
 hold on
-legend('Odometry','Dynamics','Target Position','Target Point')
+legend('Odometry','Dynamics','Tag Position','Target Point')
 xlabel('x [m]')
 ylabel('y [m]')
 xlim([-10 10])

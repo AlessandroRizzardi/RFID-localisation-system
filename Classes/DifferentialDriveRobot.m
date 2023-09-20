@@ -16,6 +16,7 @@ classdef DifferentialDriveRobot < handle
         R;  % radius of the wheel [m]
         KL;
         KR;
+        dt;
 
     end % properties
 
@@ -29,7 +30,7 @@ classdef DifferentialDriveRobot < handle
     % here we firstly define the functions that are intended to be called in the main program                                                                                                                   
     methods 
 
-        function obj = DifferentialDriveRobot(initial_state, R, d, KR, KL) % constructor
+        function obj = DifferentialDriveRobot(initial_state, R, d, KR, KL, dt) % constructor
             obj.x = zeros(3,1);
             obj.x(1) = initial_state(1);
             obj.x(2) = initial_state(2);
@@ -42,6 +43,8 @@ classdef DifferentialDriveRobot < handle
             obj.KR = KR;
             obj.KL = KL;
 
+            obj.dt = dt; % integration-scheme time step
+
         end
 
         function state = get_state(obj)
@@ -52,27 +55,27 @@ classdef DifferentialDriveRobot < handle
             state_odometry = obj.x_est;
         end
 
-        function x_next = dynamics(obj,v,w)
-            [uR,uL] = vwTovv(obj,v,w);
+        function x_next = dynamics(obj,v,omega)
+            [uR,uL] = vwTovv(obj,v,omega);
 
-            obj.x(3) = obj.x(3) + ((uR - uL)/obj.d);
             obj.x(1) = obj.x(1) + ((uR + uL)/2)*cos(obj.x(3));
             obj.x(2) = obj.x(2) + ((uR + uL)/2)*sin(obj.x(3));
+            obj.x(3) = obj.x(3) + ((uR - uL)/obj.d);
             
 
             x_next = obj.x; 
         end
 
         
-        function odometry_estimation = odometry_step(obj,v,w)
-            [uR,uL] = vwTovv(obj,v,w);
+        function odometry_estimation = odometry_step(obj,v,omega)
+            [uR,uL] = vwTovv(obj,v,omega);
 
             u_est = (uR + uL)/2 + normrnd(0,sqrt(obj.KR*abs(uR)));
             omega_est =(uR - uL)/(obj.d) + normrnd(0,sqrt(obj.KL*abs(uL)));
 
-            obj.x_est(3) = obj.x_est(3) + omega_est;
             obj.x_est(1) = obj.x_est(1) + u_est*cos(obj.x_est(3)); 
             obj.x_est(2) = obj.x_est(2) + u_est*sin(obj.x_est(3)); 
+            obj.x_est(3) = obj.x_est(3) + omega_est;
             
 
             Q = [obj.KR * abs(uR) , 0 ; 0, obj.KL*abs(uL)];
@@ -110,15 +113,16 @@ classdef DifferentialDriveRobot < handle
     % |_|   |_|  |_| \_/ \__,_|\__\___| |_|  |_|\___|_| |_| |_|_.__/ \___|_|  |___/
     %
     % Here are defined auxiliary functions used in the public members or for other simpler computations
-        function [uR,uL] = vwTovv(obj,v,w) % switch from v, omega to vR,vL
-            uR = v + obj.d*w/2;  
-            uL = uR - obj.d*w;
+        function [uR,uL] = vwTovv(obj,v, dtheta) % switch from v, omega to vR,vL
+
+            uR = (v + obj.d*dtheta/2)*obj.dt;  
+            uL = (v - dtheta*obj.d/2)*obj.dt;
         end
 
-        function [v,w] = vvTovw(obj,vR,vL)    %switch from vR.vL to v, omega
-            v = obj.R*(vR+vL)/2;
-            w = obj.R*(vR-vL)/2;
-        end
+        %function [v,w] = vvTovw(obj,vR,vL)    %switch from vR.vL to v, omega
+        %    v = obj.R*(vR+vL)/2;
+        %    w = obj.R*(vR-vL)/2;
+        %end
 
         function distance = getTagDistance(obj,tag_position)
             x_tag =  tag_position(1);
