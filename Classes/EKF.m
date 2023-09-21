@@ -114,15 +114,16 @@ methods
     % considering the phase measurements collected over a time window comprising the last Ns = 50 steps
     % 1) the movement of the tag position estimate in the last Ns steps (metric M1 );
     % 2) the agreement of the tag position estimate with the last Ns measurements (metric M2 ).
-    function weight_tmp = EKF_weight_tmp(obj, j, state_history, odometry_history, phase_history, Ns, weight_prec, c1, c2, K)
+    function weight_tmp = EKF_weight_tmp(obj, k, state_history, odometry_history, phase_history, Ns, weight_prec, c1, c2, K)
 
         sum_phase_diff = 0;
 
-        for i = (j-Ns) : j-1
+        for i = (k-Ns) : (k-1)
+            
             x_tag(i) =  odometry_history{i,1}(1) + state_history{i,1}(1)*cos(odometry_history{i,1}(3) - state_history{i,1}(2));
             y_tag(i) =  odometry_history{i,1}(2) + state_history{i,1}(1)*sin(odometry_history{i,1}(3) - state_history{i,1}(2));
 
-            if i == (j-Ns)
+            if i == (k-Ns)
                 x_min_tag = x_tag(i);
                 y_min_tag = y_tag(i);
                 x_max_tag = x_tag(i);
