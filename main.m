@@ -53,14 +53,18 @@ for k = 1:steps
         % Initialize nM EKF instances (l = 1,2,...,nM)
         for l = 1:nM
             EKF_instances(l).EKF_init(phase_measured,l,lambda,sigma_phi);
+
+            % Save the state history of each EKF instance
+            EKF_instances(l).state_history{k,1} = EKF_instances(l).x;
         end
 
         rho_est = EKF_instances(nM).x(1);
         beta_est = EKF_instances(nM).x(2);
+        best_state_estimate{k,1} = [rho_est;beta_est];
+
         display('Enter in tag-range at time step:');
         display(k)
-        state_history{k,1} = [rho_est;beta_est];
-
+    
         if rho_est < 0.3 || go_in == false
             go_in = false;
             target_point = rand(2,1)*40-20;
@@ -86,7 +90,10 @@ for k = 1:steps
         % Prediction and Correction EKF
         for l = 1:nM
             EKF_instances(l).EKF_predict(odometry_estimation, d);
-            EKF_instances(l).EKF_correct(K, sigma_phi, phase_measured); 
+            EKF_instances(l).EKF_correct(K, sigma_phi, phase_measured);
+            
+            % Save the state history of each EKF instance
+            EKF_instances(l).state_history{k,1} = EKF_instances(l).x;
         end
 
         % Correction of non-positive range estimation
@@ -96,13 +103,12 @@ for k = 1:steps
                 EKF_instances(l).x(2) = EKF_instances(l).x(2) + pi;
             end
         end
-
         
         if steps_in_range >= Ns
             % Weighing Step
             for l = 1:nM
                 %display(k)
-                weights_tmp(l) = EKF_instances(l).EKF_weight_tmp(k, state_history, odometry_history, phase_history, Ns, weights_prev(l), c1, c2, K);
+                weights_tmp(l) = EKF_instances(l).EKF_weight_tmp(k, odometry_history, phase_history, Ns, weights_prev(l), c1, c2, K,l);
             end
 
             eta = compute_eta(weights_tmp);
@@ -119,7 +125,7 @@ for k = 1:steps
             rho_est = EKF_instances(instance_selected).x(1);
             beta_est = EKF_instances(instance_selected).x(2);
 
-            state_history{k,1} = [rho_est;beta_est];
+            best_state_estimate{k,1} = [rho_est;beta_est];
 
             if rho_est < 0.3 || go_in == false
                 go_in = false;
@@ -142,7 +148,7 @@ for k = 1:steps
             rho_est  = EKF_instances(nM).x(1);
             beta_est = EKF_instances(nM).x(2);
 
-            state_history{k,1} = [rho_est;beta_est];
+            best_state_estimate{k,1} = [rho_est;beta_est];
 
             if rho_est < 0.3 || go_in == false
                 go_in = false;
@@ -166,7 +172,13 @@ for k = 1:steps
 
     elseif  robot.inTagRange(tag_position, max_range) == false       % check if the robot is out of range of the tag
         
-        state_history{k,1} = [];
+        for l=1:nM
+            % Save the state history of each EKF instance --> void because the robot is out of rangex\
+            EKF_instances(l).state_history{k,1} = [];
+        end
+
+        best_state_estimate{k,1} = [];
+        
         phase_history(k,1) = 0;
 
         x_target = target_point(1);
@@ -193,8 +205,8 @@ for k = 1:steps
 
 end
 
-best_tag_estimation_x = odometry_history{end,1}(1) + state_history{end,1}(1) * cos(odometry_history{end,1}(3) - state_history{end,1}(2));
-best_tag_estimation_y = odometry_history{end,1}(2) + state_history{end,1}(1) * sin(odometry_history{end,1}(3) - state_history{end,1}(2));
+best_tag_estimation_x = odometry_history{end,1}(1) + best_state_estimate{end,1}(1) * cos(odometry_history{end,1}(3) - best_state_estimate{end,1}(2));
+best_tag_estimation_y = odometry_history{end,1}(2) + best_state_estimate{end,1}(1) * sin(odometry_history{end,1}(3) - best_state_estimate{end,1}(2));
 
 x_odometry = zeros(length(odometry_history),1);
 y_odometry = zeros(length(odometry_history),1);

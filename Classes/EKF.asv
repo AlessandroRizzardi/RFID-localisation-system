@@ -116,7 +116,7 @@ methods
     % considering the phase measurements collected over a time window comprising the last Ns = 50 steps
     % 1) the movement of the tag position estimate in the last Ns steps (metric M1 );
     % 2) the agreement of the tag position estimate with the last Ns measurements (metric M2 ).
-    function weight_tmp = EKF_weight_tmp(obj, k, odometry_history, phase_history, Ns, weight_prec, c1, c2, K, l)
+    function weight_tmp = EKF_weight_tmp(obj, k, odometry_history, phase_history, Ns, weight_prec, c1, c2, K)
 
         sum_phase_diff = 0;
 
@@ -125,6 +125,7 @@ methods
             x_tag =  odometry_history{i,1}(1) + obj.state_history{i,1}(1)*cos(odometry_history{i,1}(3) - obj.state_history{i,1}(2));
             y_tag =  odometry_history{i,1}(2) + obj.state_history{i,1}(1)*sin(odometry_history{i,1}(3) - obj.state_history{i,1}(2));
 
+            display('Po')
 
             if i == (k-Ns+1)
                 x_min_tag = x_tag;
@@ -152,17 +153,13 @@ methods
             phase_diff = (phase_history(i) - phi_expected)^2;
 
             sum_phase_diff = sum_phase_diff + phase_diff;
+
             
         end
 
         M1 = 1/(1 + sqrt((x_max_tag - x_min_tag)^2 + (y_max_tag - y_min_tag)^2));
 
         M2 = 1/sqrt(sum_phase_diff);
-
-        % Print x_max_tag, x_min_tag, y_max_tag, y_min_tag, phi_expected
-        fprintf('EKF INSTANCE: %d \n',l);
-        fprintf('x_max_tag = %f, x_min_tag = %f, y_max_tag = %f, y_min_tag = %f \n',x_max_tag, x_min_tag, y_max_tag, y_min_tag);
-        fprintf('D: %f, -2*K*D: %f, Phi expected = %f\n',D, -2*K*D, phi_expected);
         
         weight_tmp = weight_prec + c1*M1 + c2*M2; 
        
