@@ -118,12 +118,12 @@ methods
 
         sum_phase_diff = 0;
 
-        for i = (k-Ns) : (k-1)
+        for i = (k-Ns+1) : (k-1)
             
             x_tag(i) =  odometry_history{i,1}(1) + state_history{i,1}(1)*cos(odometry_history{i,1}(3) - state_history{i,1}(2));
             y_tag(i) =  odometry_history{i,1}(2) + state_history{i,1}(1)*sin(odometry_history{i,1}(3) - state_history{i,1}(2));
 
-            if i == (k-Ns)
+            if i == (k-Ns+1)
                 x_min_tag = x_tag(i);
                 y_min_tag = y_tag(i);
                 x_max_tag = x_tag(i);

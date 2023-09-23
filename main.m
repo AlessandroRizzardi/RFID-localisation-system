@@ -76,6 +76,7 @@ for k = 1:steps
         odometry_estimation = robot.odometry_step(v,omega);
 
         odometry_history{k,1} = robot.x_est;
+
    
     elseif inTagRange == true && robot.inTagRange(tag_position, max_range) == true        % check if the robot is still in range of the tag
 
