@@ -64,9 +64,10 @@ for k = 1:steps
         if rho_est < 0.3 || go_in == false
             go_in = false;
             target_point = rand(2,1)*40-20;
-            [v,omega] = greedy_controller(Kp_v,Kp_w,target_point(1),target_point(2),robot.x_est);
+            [v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
         else
-            [v,omega] = tag_pursuit_controller(Kp_v, Kp_w, rho_est,beta_est);   % proportional constant may be different from the ones in greedy_controller
+            display('Using tag-pursuit controlle 1st');
+            [v,omega] = tag_pursuit_controller(Kp_v2, Kp_w2, rho_est,beta_est);   % proportional constant may be different from the ones in greedy_controller
         end
 
         x_next = robot.dynamics(v,omega);
@@ -122,9 +123,11 @@ for k = 1:steps
             if rho_est < 0.3 || go_in == false
                 go_in = false;
                 target_point = rand(2,1)*16-8;
-                [v,omega] = greedy_controller(Kp_v,Kp_w, target_point(1),target_point(2),robot.x_est);
+                [v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
             else
-                [v,omega] = tag_pursuit_controller(Kp_v, Kp_w, rho_est, beta_est);
+                display('Using tag-pursuit controller:');
+                display(k);
+                [v,omega] = tag_pursuit_controller(Kp_v2, Kp_w2, rho_est, beta_est);
             end
 
             x_next = robot.dynamics(v,omega);
@@ -143,9 +146,11 @@ for k = 1:steps
             if rho_est < 0.3 || go_in == false
                 go_in = false;
                 target_point = rand(2,1)*16-8;
-                [v,omega] = greedy_controller(Kp_v, target_point(1),target_point(2),robot.x_est);
+                [v,omega] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2),robot.x_est);
             else
-                [v,omega] = tag_pursuit_controller(Kp_v, Kp_w, rho_est,beta_est);
+                %display('Using tag-pursuit controller:');
+                %display(k);
+                [v,omega] = tag_pursuit_controller(Kp_v2, Kp_w2, rho_est,beta_est);
             end
 
             x_next = robot.dynamics(v,omega);
@@ -170,9 +175,9 @@ for k = 1:steps
         if distance < 0.5
             target_point = rand(2,1)*16-8;
             points_vector(end+1,:) = [target_point(1),target_point(2)];
-            [v,dtheta] = greedy_controller(Kp_v, Kp_w, target_point(1),target_point(2),robot.x_est);
+            [v,dtheta] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2),robot.x_est);
         else
-            [v,dtheta] = greedy_controller(Kp_v,Kp_w, target_point(1),target_point(2),robot.x_est);
+            [v,dtheta] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
         end
 
 
@@ -187,8 +192,8 @@ for k = 1:steps
 
 end
 
-%best_tag_estimation_x = odometry_history{end,1}(1) + state_history{end,1}(1) * cos(odometry_history{end,1}(3) - state_history{end,1}(2));
-%best_tag_estimation_y = odometry_history{end,1}(2) + state_history{end,1}(1) * sin(odometry_history{end,1}(3) - state_history{end,1}(2));
+best_tag_estimation_x = odometry_history{end,1}(1) + state_history{end,1}(1) * cos(odometry_history{end,1}(3) - state_history{end,1}(2));
+best_tag_estimation_y = odometry_history{end,1}(2) + state_history{end,1}(1) * sin(odometry_history{end,1}(3) - state_history{end,1}(2));
 
 x_odometry = zeros(length(odometry_history),1);
 y_odometry = zeros(length(odometry_history),1);
@@ -216,9 +221,8 @@ plot(x_dynamics,y_dynamics,'r')
 hold on
 plot(tag_position(1),tag_position(2),'r*','MarkerSize',10)
 hold on
-%plot(best_tag_estimation_x, best_tag_estimation_y,'b*','MarkerSize',10)
+plot(best_tag_estimation_x, best_tag_estimation_y,'b*','MarkerSize',10)
 plot(x_coord,y_coord);
-%plot(best_tag_estimation_x,best_tag_estimation_y,'g*','MarkerSize',10)
 hold on
 legend('Odometry','Dynamics','Tag Position','Best estimation')
 xlabel('x [m]')
