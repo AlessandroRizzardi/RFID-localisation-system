@@ -31,9 +31,9 @@ for i=1:steps
     if distance < 0.5
         target_point = rand(2,1)*16-8;
         points_vector(end+1,:) = [target_point(1),target_point(2)];
-        [v,dtheta] = greedy_controller(Kp_v, Kp_w, target_point(1),target_point(2),robot.x_est);
+        [v,dtheta] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2),robot.x_est);
     else
-        [v,dtheta] = greedy_controller(Kp_v,Kp_w, target_point(1),target_point(2),robot.x_est);
+        [v,dtheta] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
     end
 
     x_next = robot.dynamics(v,dtheta);
