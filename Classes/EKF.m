@@ -28,7 +28,14 @@ methods
         obj.state_history{1,1} = [];
     end
 
-
+    % function that checks if the filter state has values and it is not NaN
+    function error_state = check_state(obj)
+        if isnan(obj.x) == true
+            error_state = true;
+        end
+        error_state = false;
+    end
+    
 
     % Constructor that corresponds to initialization step of the filter
     % z0 is the measurement at time 0
@@ -47,6 +54,13 @@ methods
 
         EKF_instance{1,1} = obj.x;
         EKF_instance{2,1} = obj.P;
+        
+        % check if the state is NaN
+
+        if isnan(obj.x) == true
+            fprintf('PHASE INITIALIZATION ------ ERROR STATE NaN\n');
+        end
+
     end
     
     % function that computes the prediction step of the filter
@@ -80,6 +94,14 @@ methods
 
         obj.x = [ro_next;beta_next];
         obj.P = P_next;
+        
+
+        % check if the state is NaN
+
+        if isnan(obj.x) == true
+            fprintf('PHASE UPDATE ----- ERROR STATE NaN\n');
+        end
+
     end
 
     % function that computes the correction step of the filter
@@ -110,6 +132,13 @@ methods
         obj.x = [ro_next;beta_next];
         obj.P = P_next;
 
+
+        % check if the state is NaN
+
+        if isnan(obj.x) == true
+            fprintf('PHASE CORRECTION ------ ERROR STATE NaN\n');
+        end
+            
     end
 
     % each EKF instance is weighed The weight is computed taking into account two kinds of metric computed 
@@ -124,7 +153,7 @@ methods
             
             x_tag =  odometry_history{i,1}(1) + obj.state_history{i,1}(1)*cos(odometry_history{i,1}(3) - obj.state_history{i,1}(2));
             y_tag =  odometry_history{i,1}(2) + obj.state_history{i,1}(1)*sin(odometry_history{i,1}(3) - obj.state_history{i,1}(2));
-
+            
 
             if i == (k-Ns+1)
                 x_min_tag = x_tag;
@@ -158,10 +187,6 @@ methods
         M1 = 1/(1 + sqrt((x_max_tag - x_min_tag)^2 + (y_max_tag - y_min_tag)^2));
 
         M2 = 1/sqrt(sum_phase_diff);
-
-        if isnan(x_tag) == true
-            fprintf('Error\n');
-        end
 
         % Print x_max_tag, x_min_tag, y_max_tag, y_min_tag, phi_expected
         fprintf('EKF INSTANCE: %d \n',l);

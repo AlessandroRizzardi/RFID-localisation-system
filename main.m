@@ -56,6 +56,11 @@ for k = 1:steps
 
             % Save the state history of each EKF instance
             EKF_instances(l).state_history{k,1} = EKF_instances(l).x;
+
+            if isnan(EKF_instances(l).state_history{k,1}) == true
+                fprintf('Error state history\n');
+            end
+
         end
 
         display('Matrix P:')
@@ -98,9 +103,10 @@ for k = 1:steps
             % Save the state history of each EKF instance
             EKF_instances(l).state_history{k,1} = EKF_instances(l).x;
 
-            if isnan(EKF_instances(l).x(1)) == true
-                fprintf('errore');
-            end
+            % if isnan(EKF_instances(l).state_history{k,1}) == true
+            %     fprintf('Error state history\n');
+            % end
+
         end
 
         % Correction of non-positive range estimation
@@ -182,6 +188,7 @@ for k = 1:steps
         for l=1:nM
             % Save the state history of each EKF instance --> void because the robot is out of rangex\
             EKF_instances(l).state_history{k,1} = [];
+
         end
 
         best_state_estimate{k,1} = [];
