@@ -47,7 +47,7 @@ for k = 1:steps
     if inTagRange == false && robot.inTagRange(tag_position, max_range) == true        % check if it is the first time the phase measurement is available
 
         inTagRange = true;
-        phase_measured = robot.phaseMeasured(tag_position, lambda , true, sigma_phi);
+        phase_measured = robot.phaseMeasured(tag_position, lambda , sigma_phi);
         phase_history(k,1) = phase_measured;
 
         % Initialize nM EKF instances (l = 1,2,...,nM)
@@ -58,11 +58,14 @@ for k = 1:steps
             EKF_instances(l).state_history{k,1} = EKF_instances(l).x;
         end
 
+        display('Matrix P:')
+        display(EKF_instances(l).P)
+
         rho_est = EKF_instances(nM).x(1);
         beta_est = EKF_instances(nM).x(2);
         best_state_estimate{k,1} = [rho_est;beta_est];
 
-        display('Enter in tag-range at time step:');
+        display('Enter in tag-range at time step:')
         display(k)
     
         if rho_est < 0.3 || go_in == false
@@ -84,7 +87,7 @@ for k = 1:steps
    
     elseif inTagRange == true && robot.inTagRange(tag_position, max_range) == true        % check if the robot is still in range of the tag
 
-        phase_measured = robot.phaseMeasured(tag_position, lambda , true, sigma_phi);
+        phase_measured = robot.phaseMeasured(tag_position, lambda , sigma_phi);
         phase_history(k,1) = phase_measured;
 
         % Prediction and Correction EKF
@@ -94,6 +97,10 @@ for k = 1:steps
             
             % Save the state history of each EKF instance
             EKF_instances(l).state_history{k,1} = EKF_instances(l).x;
+
+            if isnan(EKF_instances(l).x(1)) == true
+                fprintf('errore');
+            end
         end
 
         % Correction of non-positive range estimation
@@ -202,6 +209,10 @@ for k = 1:steps
 
         inTagRange = false;
     end
+
+
+    display('---------------------ITERATION K:-------------------.');
+    display(k);
 
 end
 

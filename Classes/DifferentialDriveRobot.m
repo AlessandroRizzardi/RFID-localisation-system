@@ -70,14 +70,16 @@ classdef DifferentialDriveRobot < handle
         function odometry_estimation = odometry_step(obj,v,omega)
             [uR,uL] = vwTovv(obj,v,omega);
 
-            u_est = (uR + uL)/2 + normrnd(0,sqrt(obj.KR*abs(uR)));
-            omega_est =(uR - uL)/(obj.d) + normrnd(0,sqrt(obj.KL*abs(uL)));
+            uR = uR + normrnd(0,sqrt(obj.KR*abs(uR)));
+            uL = uL + normrnd(0,sqrt(obj.KL*abs(uL)));
+
+            u_est = (uR + uL)/2;
+            omega_est =(uR - uL)/(obj.d);
 
             obj.x_est(1) = obj.x_est(1) + u_est*cos(obj.x_est(3)); 
             obj.x_est(2) = obj.x_est(2) + u_est*sin(obj.x_est(3)); 
             obj.x_est(3) = obj.x_est(3) + omega_est;
             
-
             Q = [obj.KR * abs(uR) , 0 ; 0, obj.KL*abs(uL)];
 
             odometry_estimation = {[u_est,omega_est],Q}; 
@@ -93,16 +95,12 @@ classdef DifferentialDriveRobot < handle
             end
         end
 
-        function phase_measured = phaseMeasured(obj, tag_position, lambda , noise, sigma_phi)
+        function phase_measured = phaseMeasured(obj, tag_position, lambda , sigma_phi)
             distance = obj.getTagDistance(tag_position);
         
             phase = (distance * 4 * pi)/lambda;
 
-            if noise == true
-                phase_measured = mod(phase, 2*pi) + normrnd(0,sigma_phi^2);
-            else
-                phase_measured = mod(phase, 2*pi);
-            end
+            phase_measured = mod(phase + normrnd(0,sigma_phi^2) , 2*pi) ;
 
         end
 

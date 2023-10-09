@@ -159,6 +159,10 @@ methods
 
         M2 = 1/sqrt(sum_phase_diff);
 
+        if isnan(x_tag) == true
+            fprintf('Error\n');
+        end
+
         % Print x_max_tag, x_min_tag, y_max_tag, y_min_tag, phi_expected
         fprintf('EKF INSTANCE: %d \n',l);
         fprintf('x_max_tag = %f, x_min_tag = %f, y_max_tag = %f, y_min_tag = %f \n',x_max_tag, x_min_tag, y_max_tag, y_min_tag);
