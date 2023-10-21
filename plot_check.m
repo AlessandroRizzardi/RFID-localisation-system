@@ -12,7 +12,7 @@ for i = 1:length(odometry_history)
 end
 
 angle = 0:0.1:2*pi;
-rad = 5; %[m]
+rad = max_range;%[m]
 x_coord = tag_position(1) + rad*cos(angle);
 y_coord = tag_position(2) + rad*sin(angle);
 

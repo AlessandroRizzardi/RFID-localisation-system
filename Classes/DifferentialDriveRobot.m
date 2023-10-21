@@ -100,7 +100,7 @@ classdef DifferentialDriveRobot < handle
         
             phase = (distance * 4 * pi)/lambda;
 
-            phase_measured = mod(phase + normrnd(0,sigma_phi^2) , 2*pi) ;
+            phase_measured = mod(-phase + normrnd(0,sigma_phi) , 2*pi) ;
 
         end
 

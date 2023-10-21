@@ -10,7 +10,8 @@ properties
 
     x; % filter of the state (ro, beta)
     P; % covariance matrix of the state
-    state_history; % history of the state                 
+    state_history; % history of the state   
+    weight; % weight of the EKF instance              
 end % properties
 
 %  ____        _     _ _        __  __                _                                                             
@@ -26,6 +27,7 @@ methods
         obj.x = zeros(2,1);
         obj.P = zeros(2,2);
         obj.state_history{1,1} = [];
+        obj.weight = 0;
     end
 
     % function that checks if the filter state has values and it is not NaN
@@ -39,9 +41,8 @@ methods
 
     % Constructor that corresponds to initialization step of the filter
     % z0 is the measurement at time 0
-    function EKF_instance = EKF_init(obj,phi_0, l, lambda, sigma_phi) % constructor
-        
-        
+    function EKF_instance = EKF_init(obj,phi_0, l, lambda, sigma_phi,weight_init) % constructor
+              
         
         K = (2*pi)/lambda;
         ro_0 = -phi_0/(2*K) + (l*lambda)/2;
@@ -51,6 +52,8 @@ methods
 
         sigma_d = sigma_phi/(2*K);
         obj.P = [sigma_d^2, 0; 0, (pi/3)^2];
+
+        obj.weight = weight_init;
 
         EKF_instance{1,1} = obj.x;
         EKF_instance{2,1} = obj.P;
@@ -84,16 +87,16 @@ methods
              -(u/ro_curr^2)*sin(beta_curr),   1 + (u/ro_curr)*cos(beta_curr)];
 
         W = [                  -0.5*cos(beta_curr),                     -0.5*cos(beta_curr);...
-              1/d + (1/(2*ro_curr))*sin(beta_curr),    1/d + (1/(2*ro_curr))*sin(beta_curr)];
+              1/d + (1/(2*ro_curr))*sin(beta_curr),    -1/d + (1/(2*ro_curr))*sin(beta_curr)];
         
         P_next = F*P_curr*F' + W*Q*W';
         
         
-        EKF_instance_est{1,1} = [ro_next;beta_next];
-        EKF_instance_est{2,1} = P_curr;
-
         obj.x = [ro_next;beta_next];
         obj.P = P_next;
+
+        EKF_instance_est{1,1} = [ro_next;beta_next];
+        EKF_instance_est{2,1} = P_curr;
         
 
         % check if the state is NaN
@@ -115,23 +118,29 @@ methods
 
         H = [-2*K, 0];
         
-        K_gain = P_curr*H'/(H*P_curr*H' + R);
+        K_gain = P_curr*H'*pinv(H*P_curr*H' + R);
 
         phi_expected = mod(-2*K*ro_curr,2*pi);
 
-        x_next = [ro_curr;beta_curr] + K_gain*(phi_meas - phi_expected);
+        innovation = phi_meas - phi_expected;
+        innovation = atan2(sin(innovation),cos(innovation));
+
+        x_next = [ro_curr;beta_curr] + K_gain*(innovation);
 
         P_next = (eye(2) - K*H)*P_curr;
 
         ro_next = x_next(1);
         beta_next = x_next(2);
 
-        EKF_instance_est{1,1} = [ro_next;beta_next];
-        EKF_instance_est{2,1} = P_next;
+        % update the weight of the EKF instance
+        obj.weight = obj.weight*exp(-0.5*innovation^2*pinv(H*P_curr*H' + R));
 
         obj.x = [ro_next;beta_next];
         obj.P = P_next;
 
+        EKF_instance_est{1,1} = [ro_next;beta_next];
+        EKF_instance_est{2,1} = P_next;
+        
 
         % check if the state is NaN
 
