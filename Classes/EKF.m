@@ -60,9 +60,9 @@ methods
         
         % check if the state is NaN
 
-        if isnan(obj.x) == true
-            fprintf('PHASE INITIALIZATION ------ ERROR STATE NaN\n');
-        end
+        % if isnan(obj.x) == true
+        %     fprintf('PHASE INITIALIZATION ------ ERROR STATE NaN\n');
+        % end
 
     end
     
@@ -101,9 +101,9 @@ methods
 
         % check if the state is NaN
 
-        if isnan(obj.x) == true
-            fprintf('PHASE UPDATE ----- ERROR STATE NaN\n');
-        end
+        % if isnan(obj.x) == true
+        %     fprintf('PHASE UPDATE ----- ERROR STATE NaN\n');
+        % end
 
     end
 
@@ -144,9 +144,9 @@ methods
 
         % check if the state is NaN
 
-        if isnan(obj.x) == true
-            fprintf('PHASE CORRECTION ------ ERROR STATE NaN\n');
-        end
+        % if isnan(obj.x) == true
+        %     fprintf('PHASE CORRECTION ------ ERROR STATE NaN\n');
+        % end
             
     end
 

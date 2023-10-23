@@ -1,7 +1,7 @@
 % This files contains all the parameters used while running the SLAM algorithms
 
 
-Tf = 50; % Total time [s]
+Tf = 25; % Total time [s]
 %Ts = 1; % Sampling time [s]
 dt = 10^-3; % integration-scheme timestep
 
@@ -14,7 +14,7 @@ K = 2*pi/lambda;
 
 Ns = 50; % number of precedent steps used in MHEKF
 
-max_range = 3; % [m] maximum range of the reader
+max_range = 2; % [m] maximum range of the reader
 nM = ceil(max_range/(lambda/2)); % number of measurements
 
 
@@ -36,5 +36,5 @@ Kp_v2 = 0.1; % proportional parameters for PID the controller tag-pursuit
 Kp_w2= 0.2;
 
 
-x_range = [-5 5]; % [m] range of the map
-y_range = [-5 5]; % [m] range of the map
+x_range = [0 2]; % [m] range of the map
+y_range = [0 2]; % [m] range of the map

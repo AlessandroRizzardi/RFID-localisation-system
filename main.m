@@ -3,7 +3,6 @@ close all;
 clear;  
 clc;
 
-addpath('Scripts')
 addpath('Functions')
 addpath('Classes')
 
@@ -269,8 +268,8 @@ hold on
 legend('Odometry','Dynamics','Tag Position','Best estimation')
 xlabel('x [m]')
 ylabel('y [m]')
-xlim([-10 10])
-ylim([-10 10])
+xlim(x_range)
+ylim(y_range)
 
 
 

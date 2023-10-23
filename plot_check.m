@@ -30,5 +30,5 @@ hold on
 legend('Odometry','Dynamics','Tag Position','Targets')
 xlabel('x [m]')
 ylabel('y [m]')
-xlim([-15 15])
-ylim([-15 15])
+xlim(x_range)
+ylim(y_range)

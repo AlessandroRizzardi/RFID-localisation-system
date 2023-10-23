@@ -2,7 +2,6 @@ close all;
 clear;  
 clc;
 
-addpath('Scripts')
 addpath('Functions')
 addpath('Classes')
 
@@ -13,7 +12,7 @@ config
 % Initialize the robot
 robot = DifferentialDriveRobot([0;0;0],R,d,KR,KL,dt);
 
-Tf = 5; % simulation time
+Tf = 50; % simulation time
 steps = floor(Tf/robot.dt);
 
 % Define position of the target randomly with x and y between -8 and 8
@@ -29,7 +28,8 @@ for i=1:steps
     distance = sqrt((robot.x_est(1) - target_point(1))^2 + (robot.x_est(2) - target_point(2))^2);
 
     if distance < 0.5
-        target_point = rand(2,1)*16-8;
+        target_point(1) = x_range(1) + (x_range(2)-x_range(1))*rand();
+        target_point(2) = y_range(1) + (y_range(2)-y_range(1))*rand();
         points_vector(end+1,:) = [target_point(1),target_point(2)];
         [v,dtheta] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2),robot.x_est);
     else
@@ -66,7 +66,7 @@ plot(x_dynamics,y_dynamics,'r')
 hold on
 plot(points_vector(:,1),points_vector(:,2),'g*','MarkerSize',10)
 hold on
-legend('Odometry','Dynamics','Target Position','Target Point')
+legend('Odometry','Dynamics','Target Position')
 xlabel('x [m]')
 ylabel('y [m]')
 xlim([-10 10])
