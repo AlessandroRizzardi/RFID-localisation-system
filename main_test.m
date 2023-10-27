@@ -16,7 +16,7 @@ config
 robot = DifferentialDriveRobot([0;0;0],R,d,KR,KL,dt);
 
 % Define position of the tag
-tag_position = [1;1];
+tag_position = [1.6;1.6];
 
 % 1st virtual target point
 % random number between -5 and 5
@@ -61,7 +61,7 @@ beta_est = EKF_instances(nM).x(2);
 best_state_estimate{1,1} = [rho_est;beta_est];
 
 
-for k = 2:steps
+for k = 1:steps
     
     % move the robot
     distance = sqrt((robot.x_est(1) - target_point(1))^2 + (robot.x_est(2) - target_point(2))^2);
@@ -89,11 +89,11 @@ for k = 2:steps
     for l = 1:nM
         EKF_instances(l).EKF_predict(odometry_estimation, d);
         EKF_instances(l).EKF_correct(K, sigma_phi, phase_measured);
-        
+
         weights_vec(l) = EKF_instances(l).weight;
 
         % Save the state history of each EKF instance
-        EKF_instances(l).state_history{k,1} = EKF_instances(l).x;
+        EKF_instances(l).state_history{k+1,1} = EKF_instances(l).x;
 
     end
 
@@ -114,14 +114,14 @@ for k = 2:steps
         rho_est = EKF_instances(instance_selected).x(1);
         beta_est = EKF_instances(instance_selected).x(2);
 
-        best_state_estimate{k,1} = [rho_est;beta_est];
+        best_state_estimate{k+1,1} = [rho_est;beta_est];
 
     else % we don't have enough measurements to weigh the EKF instances --> final estimates are the ones of the last EKF instance
 
         rho_est  = EKF_instances(nM).x(1);
         beta_est = EKF_instances(nM).x(2);
 
-        best_state_estimate{k,1} = [rho_est;beta_est];
+        best_state_estimate{k+1,1} = [rho_est;beta_est];
 
     end        
 

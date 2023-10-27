@@ -56,7 +56,7 @@ methods
         obj.weight = weight_init;
 
         EKF_instance{1,1} = obj.x;
-        EKF_instance{2,1} = obj.P;
+        EKF_instance{2,1} = obj.P;  
         
         % check if the state is NaN
 
@@ -127,7 +127,7 @@ methods
 
         x_next = [ro_curr;beta_curr] + K_gain*(innovation);
 
-        P_next = (eye(2) - K*H)*P_curr;
+        P_next = (eye(2) - K_gain*H)*P_curr;
 
         ro_next = x_next(1);
         beta_next = x_next(2);
