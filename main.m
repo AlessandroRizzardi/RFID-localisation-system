@@ -13,7 +13,7 @@ config
 robot = DifferentialDriveRobot([0;0;0],R,d,KR,KL,dt);
 
 % Define position of the tag
-tag_position = [3;3];
+tag_position = [5;5];
 
 % 1st virtual target point
 % random number between -5 and 5
@@ -62,13 +62,14 @@ for k = 1:steps
 
         end
 
-        display('Matrix P:')
-        display(EKF_instances(l).P)
-
         rho_est = EKF_instances(nM).x(1);
         beta_est = EKF_instances(nM).x(2);
-        best_state_estimate{k,1} = [rho_est;beta_est];
+        best_state_estimate = [rho_est;beta_est];
 
+        best_tag_estimation_x = robot.x_est(1) + best_state_estimate(1)*cos(robot.x_est(3) - best_state_estimate(2));
+        best_tag_estimation_y = robot.x_est(2) + best_state_estimate(1)*sin(robot.x_est(3) - best_state_estimate(2));
+
+    
         display('Enter in tag-range at time step:')
         display(k)
     
@@ -145,7 +146,11 @@ for k = 1:steps
             rho_est = EKF_instances(instance_selected).x(1);
             beta_est = EKF_instances(instance_selected).x(2);
 
-            best_state_estimate{k,1} = [rho_est;beta_est];
+            best_state_estimate = [rho_est;beta_est];
+
+            best_tag_estimation_x = robot.x_est(1) + best_state_estimate(1)*cos(robot.x_est(3) - best_state_estimate(2));
+            best_tag_estimation_y = robot.x_est(2) + best_state_estimate(1)*sin(robot.x_est(3) - best_state_estimate(2));
+
 
             if rho_est < 0.3 || go_in == false
                 go_in = false;
@@ -169,7 +174,11 @@ for k = 1:steps
             rho_est  = EKF_instances(nM).x(1);
             beta_est = EKF_instances(nM).x(2);
 
-            best_state_estimate{k,1} = [rho_est;beta_est];
+            best_state_estimate = [rho_est;beta_est];
+
+            best_tag_estimation_x = robot.x_est(1) + best_state_estimate(1)*cos(robot.x_est(3) - best_state_estimate(2));
+            best_tag_estimation_y = robot.x_est(2) + best_state_estimate(1)*sin(robot.x_est(3) - best_state_estimate(2));
+
 
             if rho_est < 0.3 || go_in == false
                 go_in = false;
@@ -199,8 +208,6 @@ for k = 1:steps
             EKF_instances(l).state_history{k,1} = [];
 
         end
-
-        best_state_estimate{k,1} = [];
         
         phase_history(k,1) = 0;
 
@@ -227,14 +234,8 @@ for k = 1:steps
         inTagRange = false;
     end
 
-
-    display('---------------------ITERATION K:-------------------.');
-    display(k);
-
 end
 
-best_tag_estimation_x = odometry_history{end,1}(1) + best_state_estimate{end,1}(1) * cos(odometry_history{end,1}(3) - best_state_estimate{end,1}(2));
-best_tag_estimation_y = odometry_history{end,1}(2) + best_state_estimate{end,1}(1) * sin(odometry_history{end,1}(3) - best_state_estimate{end,1}(2));
 
 x_odometry = zeros(length(odometry_history),1);
 y_odometry = zeros(length(odometry_history),1);
