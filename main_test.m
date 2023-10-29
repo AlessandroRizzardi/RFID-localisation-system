@@ -37,6 +37,10 @@ steps_in_range = 0;
 weights_vec = zeros(nM,1);
 weight_init = 1/nM;
 
+weights_tmp = zeros(nM,1);
+weights = zeros(nM,1);
+weights_prev = 10^-6*ones(nM,1);
+
 instance_selected = 0; 
 
 go_in = true;  % flag to check if the robot is going towards the tag or not
@@ -108,8 +112,25 @@ for k = 1:steps
         
     if steps_in_range >= Ns
 
+        %for l = 1:nM
+        %    %display(k)
+        %    weights_tmp(l) = EKF_instances(l).EKF_weight_tmp(k, odometry_history, phase_history, Ns, weights_prev(l), c1, c2, K,l);
+        %end
+        %
+        %eta = compute_eta(weights_tmp);
+        %
+        %for l = 1:nM
+        %    weights(l) = EKF_instances(l).EKF_weight(weights_tmp(l), eta);
+        %end
+        %
+        %weights_prev = weights;
+
+
         % Take as final estimates ρ^k and β^k the ones provided by the EKF instance with the largest weight
+        %[max_value,instance_selected] = max(weights);
+        
         [max_value,instance_selected] = max(weights_vec);
+
 
         rho_est = EKF_instances(instance_selected).x(1);
         beta_est = EKF_instances(instance_selected).x(2);

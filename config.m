@@ -38,3 +38,7 @@ Kp_w2= 0.2;
 
 x_range = [-10 10]; % [m] range of the map
 y_range = [-10 10]; % [m] range of the map
+
+method_paper = false;
+
+tag_window =[-(max_range-1), max_range-1] ;
