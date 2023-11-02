@@ -34,6 +34,9 @@ for k = 1:steps
 
     end
 
+    if mod(k,1000) == 0    
+        fprintf('--------- Step numero: %d\n ---------',k);
+    end
 end
 
 

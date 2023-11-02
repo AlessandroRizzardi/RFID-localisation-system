@@ -31,15 +31,15 @@ for i=1:steps
         target_point(1) = x_range(1) + (x_range(2)-x_range(1))*rand();
         target_point(2) = y_range(1) + (y_range(2)-y_range(1))*rand();
         points_vector(end+1,:) = [target_point(1),target_point(2)];
-        [v,dtheta] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2),robot.x_est);
+        [v,omega] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2),robot.x_est);
     else
-        [v,dtheta] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
+        [v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
     end
 
-    x_next = robot.dynamics(v,dtheta);
+    x_next = robot.dynamics(v,omega);
     dynamics_history{i,1} = x_next;
 
-    odometry_estimation = robot.odometry_step(v,dtheta);
+    odometry_estimation = robot.odometry_step(v,omega);
     odometry_history{i,1} = robot.x_est;
 
 end

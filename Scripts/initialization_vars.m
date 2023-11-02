@@ -2,7 +2,7 @@
 robot = DifferentialDriveRobot([0;0;0],R,d,KR,KL,dt);
 
 % Define position of the tag
-tag_position = [5;5];
+tag_position = [3;3];
 
 % 1st virtual target point
 % random number between -5 and 5

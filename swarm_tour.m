@@ -56,39 +56,39 @@ for i=1:steps
         targets = swarm.compute_targets(swarm_target);
         swarm_points_vector(end+1,:) = [swarm_target(1),swarm_target(2)];
 
-        [v_phantom, dtheta_phantom] = greedy_controller(Kp_v1, Kp_w1, swarm_target(1),swarm_target(2),phantom_bot.x);
+        [v_phantom, omega_phantom] = greedy_controller(Kp_v1, Kp_w1, swarm_target(1),swarm_target(2),phantom_bot.x);
 
-        [v_1, dtheta_1] = greedy_controller(Kp_v1, Kp_w1, targets{1,1}(1), targets{1,1}(2),robot_1.x_est);
-        [v_2, dtheta_2] = greedy_controller(Kp_v1, Kp_w1, targets{2,1}(1), targets{2,1}(2),robot_2.x_est);
-        [v_3, dtheta_3] = greedy_controller(Kp_v1, Kp_w1, targets{3,1}(1), targets{3,1}(2),robot_3.x_est);
-        [v_4, dtheta_4] = greedy_controller(Kp_v1, Kp_w1, targets{4,1}(1), targets{4,1}(2),robot_4.x_est);
+        [v_1, omega_1] = greedy_controller(Kp_v1, Kp_w1, targets{1,1}(1), targets{1,1}(2),robot_1.x_est);
+        [v_2, omega_2] = greedy_controller(Kp_v1, Kp_w1, targets{2,1}(1), targets{2,1}(2),robot_2.x_est);
+        [v_3, omega_3] = greedy_controller(Kp_v1, Kp_w1, targets{3,1}(1), targets{3,1}(2),robot_3.x_est);
+        [v_4, omega_4] = greedy_controller(Kp_v1, Kp_w1, targets{4,1}(1), targets{4,1}(2),robot_4.x_est);
         
     else
-        [v_phantom, dtheta_phantom] = greedy_controller(Kp_v1,Kp_w1, swarm_target(1),swarm_target(2),phantom_bot.x);
+        [v_phantom, omega_phantom] = greedy_controller(Kp_v1,Kp_w1, swarm_target(1),swarm_target(2),phantom_bot.x);
 
-        [v_1, dtheta_1] = greedy_controller(Kp_v1, Kp_w1, targets{1,1}(1), targets{1,1}(2),robot_1.x_est);
-        [v_2, dtheta_2] = greedy_controller(Kp_v1, Kp_w1, targets{2,1}(1), targets{2,1}(2),robot_2.x_est);
-        [v_3, dtheta_3] = greedy_controller(Kp_v1, Kp_w1, targets{3,1}(1), targets{3,1}(2),robot_3.x_est);
-        [v_4, dtheta_4] = greedy_controller(Kp_v1, Kp_w1, targets{4,1}(1), targets{4,1}(2),robot_4.x_est);
+        [v_1, omega_1] = greedy_controller(Kp_v1, Kp_w1, targets{1,1}(1), targets{1,1}(2),robot_1.x_est);
+        [v_2, omega_2] = greedy_controller(Kp_v1, Kp_w1, targets{2,1}(1), targets{2,1}(2),robot_2.x_est);
+        [v_3, omega_3] = greedy_controller(Kp_v1, Kp_w1, targets{3,1}(1), targets{3,1}(2),robot_3.x_est);
+        [v_4, omega_4] = greedy_controller(Kp_v1, Kp_w1, targets{4,1}(1), targets{4,1}(2),robot_4.x_est);
     end
 
-    x_next_phantom = phantom_bot.dynamics(v_phantom,dtheta_phantom);
+    x_next_phantom = phantom_bot.dynamics(v_phantom,omega_phantom);
     phantom_history{i,1} = x_next_phantom;
 
-    x_next_1 = robot_1.dynamics(v_1,dtheta_1);
-    robot_1.odometry_step(v_1,dtheta_1);
+    x_next_1 = robot_1.dynamics(v_1,omega_1);
+    robot_1.odometry_step(v_1,omega_1);
     dynamics_history_1{i,1} = x_next_1;
 
-    x_next_2 = robot_2.dynamics(v_2,dtheta_2);
-    robot_3.odometry_step(v_2,dtheta_2);
+    x_next_2 = robot_2.dynamics(v_2,omega_2);
+    robot_3.odometry_step(v_2,omega_2);
     dynamics_history_2{i,1} = x_next_2;
 
-    x_next_3 = robot_3.dynamics(v_3,dtheta_3);
-    robot_3.odometry_step(v_3,dtheta_3);
+    x_next_3 = robot_3.dynamics(v_3,omega_3);
+    robot_3.odometry_step(v_3,omega_3);
     dynamics_history_3{i,1} = x_next_3;
 
-    x_next_4 = robot_4.dynamics(v_4,dtheta_4);
-    robot_4.odometry_step(v_4,dtheta_4);
+    x_next_4 = robot_4.dynamics(v_4,omega_4);
+    robot_4.odometry_step(v_4,omega_4);
     dynamics_history_4{i,1} = x_next_4;
 end
 

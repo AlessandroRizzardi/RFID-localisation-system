@@ -41,15 +41,15 @@ else % we don't have enough measurements to weigh the EKF instances --> final es
     best_tag_estimation_y = robot.x_est(2) + best_state_estimate(1)*sin(robot.x_est(3) - best_state_estimate(2));
 
 
-    target_point(1) = best_tag_estimation_x + tag_window(1) + (tag_window(2)-tag_window(1))*rand();
-    target_point(2) = best_tag_estimation_y + tag_window(1) + (tag_window(2)-tag_window(1))*rand();
-
-    [v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
-
-    x_next = robot.dynamics(v,omega);
-    dynamics_history{k,1} = x_next;
-
-    odometry_estimation = robot.odometry_step(v,omega);
-    odometry_history{k,1} = robot.x_est;
+    %target_point(1) = best_tag_estimation_x + tag_window(1) + (tag_window(2)-tag_window(1))*rand();
+    %target_point(2) = best_tag_estimation_y + tag_window(1) + (tag_window(2)-tag_window(1))*rand();
+%
+    %[v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
+%
+    %x_next = robot.dynamics(v,omega);
+    %dynamics_history{k,1} = x_next;
+%
+    %odometry_estimation = robot.odometry_step(v,omega);
+    %odometry_history{k,1} = robot.x_est;
 
 end        

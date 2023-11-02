@@ -111,10 +111,10 @@ classdef DifferentialDriveRobot < handle
     % |_|   |_|  |_| \_/ \__,_|\__\___| |_|  |_|\___|_| |_| |_|_.__/ \___|_|  |___/
     %
     % Here are defined auxiliary functions used in the public members or for other simpler computations
-        function [uR,uL] = vwTovv(obj,v, dtheta) % switch from v, omega to vR,vL
+        function [uR,uL] = vwTovv(obj,v, omega) % switch from v, omega to vR,vL
 
-            uR = (v + obj.d*dtheta/2)*obj.dt;  
-            uL = (v - dtheta*obj.d/2)*obj.dt;
+            uR = (v + obj.d*omega/2)*obj.dt;  
+            uL = (v - omega*obj.d/2)*obj.dt;
         end
 
         %function [v,w] = vvTovw(obj,vR,vL)    %switch from vR.vL to v, omega
