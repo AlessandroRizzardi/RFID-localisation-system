@@ -21,10 +21,8 @@ for k = 1:steps
    
     elseif init == true && robot.inTagRange(tag_position, max_range) == true   % check if the robot is still in range of the tag
 
-        EKF_alghoritm            %performing prediction and correction
+        EKF_alghoritm            %performing prediction and correction and chooses an estimate between the multiple hypotesis
         
-        weighting_alghoritm      %alghoritm that chooses an estimate between the multiple hypotesis
-
         % move robot
         new_point = generateRandomPointInCircle([best_tag_estimation_x,best_tag_estimation_y], tag_window);
         [v,omega] = move_robot(target_point, new_point, robot.x_est, Kp_v1, Kp_w1);
