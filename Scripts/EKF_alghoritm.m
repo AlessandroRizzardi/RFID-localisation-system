@@ -6,35 +6,19 @@ for l = 1:nM
     EKF_instances(l).EKF_predict(odometry_estimation, d);
     EKF_instances(l).EKF_correct(K, sigma_phi, phase_measured);
     
-    if method_paper == false
-        weights_vec(l) = EKF_instances(l).weight;
-    end
-
-% Save the state history of each EKF instance
-EKF_instances(l).state_history{k,1} = EKF_instances(l).x;
-
-% if isnan(EKF_instances(l).state_history{k,1}) == true
-%     fprintf('Error state history\n');
-% end
-
+    weights_vec(l) = EKF_instances(l).weight;
 end
 
-% Correction of non-positive range estimation
+weights_vec = weights_vec/sum(weights_vec); % Normalization of weights
+
+% Correction of non-positive range estimation and range estimation too low
 for l = 1:nM
-    if EKF_instances(l).x(1) <= 10^-6
-        EKF_instances(l).x(1) = max(abs(EKF_instances(l).x(1)),10^-6);
-        EKF_instances(l).x(2) = EKF_instances(l).x(2) + pi;
+    if EKF_instances(l).x(1) < 10^-6
+        EKF_instances(l).x(1) = max([abs(EKF_instances(l).state_history(max(1,k-5),1)),10^-6]); % I choose the range of 5 steps before
+        EKF_instances(l).x(2) = EKF_instances(l).state_history(max(1,k-5),2) + pi;
+        EKF_instances(l).state_history(k,1) = EKF_instances(l).x(1);
+        EKF_instances(l).state_history(k,2) = EKF_instances(l).x(2);
     end
     EKF_instances(l).x(2) = atan2(sin(EKF_instances(l).x(2)),cos(EKF_instances(l).x(2)));
+    EKF_instances(l).state_history(k,2) = EKF_instances(l).x(2);
 end
-
-target_point(1) = best_tag_estimation_x + tag_window(1) + (tag_window(2)-tag_window(1))*rand();
-target_point(2) = best_tag_estimation_y + tag_window(1) + (tag_window(2)-tag_window(1))*rand();
-
-[v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
-        
-x_next = robot.dynamics(v,omega);
-dynamics_history{k,1} = x_next;
-
-odometry_estimation = robot.odometry_step(v,omega);
-odometry_history{k,1} = robot.x_est;

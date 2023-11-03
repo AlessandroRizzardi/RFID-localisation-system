@@ -41,4 +41,4 @@ y_range = [-5 5]; % [m] range of the map
 
 method_paper = false;
 
-tag_window =[-(max_range-1), max_range-1] ;
+tag_window = max_range - 1;

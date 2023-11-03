@@ -1,39 +1,23 @@
-for l=1:nM
-    % Save the state history of each EKF instance --> void because the robot is out of rangex\
-    EKF_instances(l).state_history{k,1} = [];
-
-end
 
 phase_history(k,1) = 0;
 
-if isnan(best_tag_estimation_x)
-    % it means that the robot was already in the range of the tag and need
-    % to try to go back inside --> we use the estimate we already have
+if isnan(best_tag_estimation_x) == true
+    % it means that the robot was never in the range, moves randomly
 
-    x_target = target_point(1);
-    y_target = target_point(2);
-    distance = sqrt((robot.x_est(1) - x_target)^2 + (robot.x_est(2) - y_target)^2);
+    new_point = generateRandomPointInCircle([0,0], (x_range(2)-x_range(1))/2);
 
-    if distance < 0.5
-        target_point(1) = x_range(1) + (x_range(2)-x_range(1))*rand();
-        target_point(2) = y_range(1) + (y_range(2)-y_range(1))*rand();  
-        points_vector(end+1,:) = [target_point(1),target_point(2)];
-        [v,omega] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2),robot.x_est);
-    else
-        [v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
-    end
+    [v,omega] = move_robot(target_point, new_point, robot.x_est, Kp_v1, Kp_w1);
 
 else
-    % the robot was never in the range, moves randomly
+    % the robot was already in the range of the tag and need
+    % to try to go back inside --> we use the estimate we already have
 
-    target_point(1) = best_tag_estimation_x + tag_window(1) + (tag_window(2)-tag_window(1))*rand();
-    target_point(2) = best_tag_estimation_y + tag_window(1) + (tag_window(2)-tag_window(1))*rand();
+    % target point needs selected randomly in the area around the best estimate of the tag we have
+    % the area is defined by a cirle with a radius that is lower than the max range of the tag (tag_window)
+    % and a center that is the best estimate of the tag we have
 
-    [v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
+    new_point = generateRandomPointInCircle([best_tag_estimation_x,best_tag_estimation_y], tag_window);
+
+    [v,omega] = move_robot(target_point, new_point, robot.x_est, Kp_v1, Kp_w1);
 end
 
-x_next = robot.dynamics(v,omega);
-dynamics_history{k,1} = x_next;
-
-odometry_estimation = robot.odometry_step(v,omega);
-odometry_history{k,1} = robot.x_est;

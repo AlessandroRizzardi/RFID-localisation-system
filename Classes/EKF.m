@@ -10,8 +10,9 @@ properties
 
     x; % filter of the state (ro, beta)
     P; % covariance matrix of the state
-    state_history; % history of the state   
-    weight; % weight of the EKF instance              
+    weight; % weight of the EKF instance  
+    weight_history; % history of the weights of the EKF instance   
+    state_history; % history of the states of the EKF instance         
 end % properties
 
 %  ____        _     _ _        __  __                _                                                             
@@ -26,8 +27,9 @@ methods
     function obj = EKF() % constructor
         obj.x = zeros(2,1);
         obj.P = zeros(2,2);
-        obj.state_history{1,1} = [];
         obj.weight = 0;
+        obj.weight_history = [];
+        obj.state_history = []; 
     end
 
     % function that checks if the filter state has values and it is not NaN
@@ -41,7 +43,7 @@ methods
 
     % Constructor that corresponds to initialization step of the filter
     % z0 is the measurement at time 0
-    function EKF_instance = EKF_init(obj,phi_0, l, lambda, sigma_phi,weight_init) % constructor
+    function EKF_init(obj,phi_0, l, lambda, sigma_phi,weight_init) % constructor
               
         
         K = (2*pi)/lambda;
@@ -54,20 +56,13 @@ methods
         obj.P = [sigma_d^2, 0; 0, (pi/3)^2];
 
         obj.weight = weight_init;
-
-        EKF_instance{1,1} = obj.x;
-        EKF_instance{2,1} = obj.P;  
-        
-        % check if the state is NaN
-
-        % if isnan(obj.x) == true
-        %     fprintf('PHASE INITIALIZATION ------ ERROR STATE NaN\n');
-        % end
+        obj.weight_history = [obj.weight_history; obj.weight];
+        obj.state_history = [obj.state_history; obj.x];
 
     end
     
     % function that computes the prediction step of the filter
-    function EKF_instance_est = EKF_predict(obj, encoder_readings, d) % constructor
+    function EKF_predict(obj, encoder_readings, d) % constructor
         % initialize cell array encoder readings
 
         u = encoder_readings{1,1}(1);
@@ -92,23 +87,15 @@ methods
         P_next = F*P_curr*F' + W*Q*W';
         
         
-        obj.x = [ro_next;beta_next];
+        obj.x = [ro_next,beta_next];
         obj.P = P_next;
 
-        EKF_instance_est{1,1} = [ro_next;beta_next];
-        EKF_instance_est{2,1} = P_curr;
-        
-
-        % check if the state is NaN
-
-        % if isnan(obj.x) == true
-        %     fprintf('PHASE UPDATE ----- ERROR STATE NaN\n');
-        % end
+        obj.state_history = [obj.state_history; obj.x];
 
     end
 
     % function that computes the correction step of the filter
-    function EKF_instance_est = EKF_correct(obj, K, sigma_phi, phi_meas) % constructor
+    function EKF_correct(obj, K, sigma_phi, phi_meas) % constructor
         
         ro_curr = obj.x(1);
         beta_curr = obj.x(2);
@@ -118,98 +105,90 @@ methods
 
         H = [-2*K, 0];
         
-        K_gain = P_curr*H'*pinv(H*P_curr*H' + R);
+        Kalman_gain = P_curr*H'*pinv(H*P_curr*H' + R);
 
         phi_expected = mod(-2*K*ro_curr,2*pi);
 
         innovation = phi_meas - phi_expected;
         innovation = atan2(sin(innovation),cos(innovation));
 
-        x_next = [ro_curr;beta_curr] + K_gain*(innovation);
+        x_next = [ro_curr;beta_curr] + Kalman_gain*(innovation);
 
-        P_next = (eye(2) - K_gain*H)*P_curr;
+        P_next = (eye(2) - Kalman_gain*H)*P_curr;
 
         ro_next = x_next(1);
         beta_next = x_next(2);
 
         % update the weight of the EKF instance
-        obj.weight = obj.weight*exp(-0.5*innovation^2*pinv(H*P_curr*H' + R));
+        obj.weight = obj.weight*exp(-0.5*innovation^2/(H*P_next*H' + R));
+        obj.weight_history = [obj.weight_history; obj.weight];
 
-        obj.x = [ro_next;beta_next];
+        obj.x = [ro_next,beta_next];
         obj.P = P_next;
-
-        EKF_instance_est{1,1} = [ro_next;beta_next];
-        EKF_instance_est{2,1} = P_next;
         
-
-        % check if the state is NaN
-
-        % if isnan(obj.x) == true
-        %     fprintf('PHASE CORRECTION ------ ERROR STATE NaN\n');
-        % end
-            
+        obj.state_history = [obj.state_history; obj.x];
     end
 
     % each EKF instance is weighed The weight is computed taking into account two kinds of metric computed 
     % considering the phase measurements collected over a time window comprising the last Ns = 50 steps
     % 1) the movement of the tag position estimate in the last Ns steps (metric M1 );
     % 2) the agreement of the tag position estimate with the last Ns measurements (metric M2 ).
-    function weight_tmp = EKF_weight_tmp(obj, k, odometry_history, phase_history, Ns, weight_prec, c1, c2, K, l)
-
-        sum_phase_diff = 0;
-
-        for i = (k-Ns+1) : (k-1)
-            
-            x_tag =  odometry_history{i,1}(1) + obj.state_history{i,1}(1)*cos(odometry_history{i,1}(3) - obj.state_history{i,1}(2));
-            y_tag =  odometry_history{i,1}(2) + obj.state_history{i,1}(1)*sin(odometry_history{i,1}(3) - obj.state_history{i,1}(2));
-            
-
-            if i == (k-Ns+1)
-                x_min_tag = x_tag;
-                y_min_tag = y_tag;
-                x_max_tag = x_tag;
-                y_max_tag = y_tag;
-            end
-
-            if x_tag < x_min_tag
-                x_min_tag = x_tag;
-            end
-            if y_tag < y_min_tag
-                y_min_tag = y_tag;
-            end
-            if x_tag > x_max_tag
-                x_max_tag = x_tag;
-            end
-            if y_tag > y_max_tag
-                y_max_tag = y_tag;
-            end
-
-            D = sqrt((odometry_history{i,1}(1) - x_tag)^2 + (odometry_history{i,1}(2) - y_tag)^2);
-            phi_expected = mod(-2*K*D,2*pi);
-
-            phase_diff = (phase_history(i) - phi_expected)^2;
-
-            sum_phase_diff = sum_phase_diff + phase_diff;
-            
-        end
-
-        M1 = 1/(1 + sqrt((x_max_tag - x_min_tag)^2 + (y_max_tag - y_min_tag)^2));
-
-        M2 = 1/sqrt(sum_phase_diff);
-
-        % Print x_max_tag, x_min_tag, y_max_tag, y_min_tag, phi_expected
-        % fprintf('EKF INSTANCE: %d \n',l);
-        % fprintf('x_max_tag = %f, x_min_tag = %f, y_max_tag = %f, y_min_tag = %f \n',x_max_tag, x_min_tag, y_max_tag, y_min_tag);
-        % fprintf('D: %f, -2*K*D: %f, Phi expected = %f\n',D, -2*K*D, phi_expected);
-        
-        weight_tmp = weight_prec + c1*M1 + c2*M2; 
-       
-    end
-
-
-    function weight = EKF_weight(obj, weight_tmp, eta)
-        weight = eta*weight_tmp;
-    end
+    % function weight_tmp = EKF_weight_tmp(obj, k, odometry_history, phase_history, Ns, weight_prec, c1, c2, K, l)
+    % 
+    %     sum_phase_diff = 0;
+    % 
+    %     for i = (k-Ns+1) : (k-1)
+    % 
+    %         x_tag =  odometry_history{i,1}(1) + obj.state_history{i,1}(1)*cos(odometry_history{i,1}(3) - obj.state_history{i,1}(2));
+    %         y_tag =  odometry_history{i,1}(2) + obj.state_history{i,1}(1)*sin(odometry_history{i,1}(3) - obj.state_history{i,1}(2));
+    % 
+    % 
+    %         if i == (k-Ns+1)
+    %             x_min_tag = x_tag;
+    %             y_min_tag = y_tag;
+    %             x_max_tag = x_tag;
+    %             y_max_tag = y_tag;
+    %         end
+    % 
+    %         if x_tag < x_min_tag
+    %             x_min_tag = x_tag;
+    %         end
+    %         if y_tag < y_min_tag
+    %             y_min_tag = y_tag;
+    %         end
+    %         if x_tag > x_max_tag
+    %             x_max_tag = x_tag;
+    %         end
+    %         if y_tag > y_max_tag
+    %             y_max_tag = y_tag;
+    %         end
+    % 
+    %         D = sqrt((odometry_history{i,1}(1) - x_tag)^2 + (odometry_history{i,1}(2) - y_tag)^2);
+    %         phi_expected = mod(-2*K*D,2*pi);
+    % 
+    %         phase_diff = (phase_history(i) - phi_expected)^2;
+    % 
+    %         sum_phase_diff = sum_phase_diff + phase_diff;
+    % 
+    %     end
+    % 
+    %     M1 = 1/(1 + sqrt((x_max_tag - x_min_tag)^2 + (y_max_tag - y_min_tag)^2));
+    % 
+    %     M2 = 1/sqrt(sum_phase_diff);
+    % 
+    %     % Print x_max_tag, x_min_tag, y_max_tag, y_min_tag, phi_expected
+    %     % fprintf('EKF INSTANCE: %d \n',l);
+    %     % fprintf('x_max_tag = %f, x_min_tag = %f, y_max_tag = %f, y_min_tag = %f \n',x_max_tag, x_min_tag, y_max_tag, y_min_tag);
+    %     % fprintf('D: %f, -2*K*D: %f, Phi expected = %f\n',D, -2*K*D, phi_expected);
+    % 
+    %     weight_tmp = weight_prec + c1*M1 + c2*M2; 
+    % 
+    % end
+    % 
+    % 
+    % function weight = EKF_weight(obj, weight_tmp, eta)
+    %     weight = eta*weight_tmp;
+    % end
 
 %  ____       _            _         __  __                _                   
 % |  _ \ _ __(_)_   ____ _| |_ ___  |  \/  | ___ _ __ ___ | |__   ___ _ __ ___ 
