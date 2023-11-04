@@ -1,9 +1,9 @@
 % This files contains all the parameters used while running the SLAM algorithms
 
 
-Tf = 50; % Total time [s]
+Tf = 20; % Total time [s]
 %Ts = 1; % Sampling time [s]
-dt = 10^-1; % integration-scheme timestep
+dt = 10^-3; % integration-scheme timestep
 
 
 f = 867*10^6; % [Hz] frequency of the reader
@@ -18,8 +18,8 @@ max_range = 6; % [m] maximum range of the reader
 %nM = ceil(max_range/(lambda/2)); % number of measurements
 nM = 10;
 
-d = 1;   % [m] distance between the 2 wheels
-R = 0.1; % [m] radius of the wheels
+d = 0.5;   % [m] distance between the 2 wheels
+R = 0.2; % [m] radius of the wheels
 
 KL = 0.01*10^-2; % noise parameters of odometry
 KR = 0.01*10^-2;

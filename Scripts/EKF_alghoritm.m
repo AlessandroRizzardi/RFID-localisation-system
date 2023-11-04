@@ -11,6 +11,11 @@ end
 
 weights_vec = weights_vec/sum(weights_vec); % Normalization of weights
 
+for l = 1:nM
+    EKF_instances(l).weight = EKF_instances(l).weight/sum(weights_vec);
+end
+
+
 % Correction of non-positive range estimation and range estimation too low
 for l = 1:nM
     if EKF_instances(l).x(1) < 10^-6

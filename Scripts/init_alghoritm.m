@@ -21,6 +21,5 @@ best_tag_estimation_y = robot.x_est(2) + rho_est*sin(robot.x_est(3) - beta_est);
 tag_estimation_history = [tag_estimation_history;best_tag_estimation_x,best_tag_estimation_y];
 
 
-target_point = generateRandomPointInCircle([best_tag_estimation_x,best_tag_estimation_y], tag_window);
-
-[v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
+%target_point = generateRandomPointInCircle([best_tag_estimation_x,best_tag_estimation_y], tag_window);
+%[v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);

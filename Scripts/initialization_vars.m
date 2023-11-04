@@ -1,7 +1,10 @@
 % Define position of the tag
-tag_position = [10;100];
+tag_position = [0;0];
 
 tag_estimation_history = [];
+
+% Initialize the robot
+robot = DifferentialDriveRobot([-2;2;0],R,d,KR,KL,dt);
 
 % 1st virtual target point
 % random number between -5 and 5
