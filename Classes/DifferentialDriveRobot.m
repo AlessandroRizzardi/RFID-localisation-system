@@ -36,7 +36,9 @@ classdef DifferentialDriveRobot < handle
             obj.x(2) = initial_state(2);
             obj.x(3) = initial_state(3);
 
-            obj.x_est = zeros(3,1);
+            obj.x_est(1) = initial_state(1);
+            obj.x_est(2) = initial_state(2);
+            obj.x_est(3) = initial_state(3);
 
             obj.R = R;
             obj.d = d;

@@ -1,9 +1,9 @@
 % This files contains all the parameters used while running the SLAM algorithms
 
 
-Tf = 20; % Total time [s]
+Tf = 50; % Total time [s]
 %Ts = 1; % Sampling time [s]
-dt = 10^-3; % integration-scheme timestep
+dt = 10^-1; % integration-scheme timestep
 
 
 f = 867*10^6; % [Hz] frequency of the reader
@@ -14,9 +14,9 @@ K = 2*pi/lambda;
 
 Ns = 50; % number of precedent steps used in MHEKF
 
-max_range = 3; % [m] maximum range of the reader
-nM = ceil(max_range/(lambda/2)); % number of measurements
-
+max_range = 6; % [m] maximum range of the reader
+%nM = ceil(max_range/(lambda/2)); % number of measurements
+nM = 10;
 
 d = 1;   % [m] distance between the 2 wheels
 R = 0.1; % [m] radius of the wheels
@@ -41,4 +41,4 @@ y_range = [-5 5]; % [m] range of the map
 
 method_paper = false;
 
-tag_window = max_range - 1;
+tag_window = max_range;

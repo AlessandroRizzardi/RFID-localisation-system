@@ -1,8 +1,9 @@
 % Initialize the robot
-robot = DifferentialDriveRobot([0;0;0],R,d,KR,KL,dt);
+initial_point = generateRandomPointInCircle([0,0], (x_range(2) - x_range(1))/2);
+robot = DifferentialDriveRobot([initial_point(1);initial_point(2);0],R,d,KR,KL,dt);
 
 % Define position of the tag
-tag_position = [3;3];
+tag_position = [0;0];
 
 tag_estimation_history = [];
 

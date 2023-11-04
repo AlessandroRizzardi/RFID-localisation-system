@@ -26,7 +26,7 @@ for k = 1:steps
         weighting_alghoritm      %alghoritm that chooses an estimate between the multiple hypotesis
 
         % move robot
-        new_point = generateRandomPointInCircle([best_tag_estimation_x,best_tag_estimation_y], tag_window);
+        new_point = generateRandomPointInCircle([0,0], tag_window);
         [v,omega] = move_robot(target_point, new_point, robot.x_est, Kp_v1, Kp_w1);
 
         steps_in_range = steps_in_range + 1;

@@ -14,11 +14,15 @@ weights_vec = weights_vec/sum(weights_vec); % Normalization of weights
 % Correction of non-positive range estimation and range estimation too low
 for l = 1:nM
     if EKF_instances(l).x(1) < 10^-6
-        EKF_instances(l).x(1) = max([abs(EKF_instances(l).state_history(max(1,k-5),1)),10^-6]); % I choose the range of 5 steps before
-        EKF_instances(l).x(2) = EKF_instances(l).state_history(max(1,k-5),2) + pi;
-        EKF_instances(l).state_history(k,1) = EKF_instances(l).x(1);
-        EKF_instances(l).state_history(k,2) = EKF_instances(l).x(2);
+        number_states = length( EKF_instances(l).state_history);
+        EKF_instances(l).x(1) = max([abs(EKF_instances(l).state_history(max(1,number_states-5),1)),10^-6]); % I choose the range of 5 steps before
+        EKF_instances(l).x(2) = EKF_instances(l).state_history(max(1,number_states-5),2) + pi;
     end
     EKF_instances(l).x(2) = atan2(sin(EKF_instances(l).x(2)),cos(EKF_instances(l).x(2)));
-    EKF_instances(l).state_history(k,2) = EKF_instances(l).x(2);
+end
+
+
+% saving the state
+for l = 1:nM
+    EKF_instances(l).state_history = [EKF_instances(l).state_history; EKF_instances(l).x];
 end

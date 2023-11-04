@@ -5,6 +5,9 @@ phase_measured = robot.phaseMeasured(tag_position, lambda , sigma_phi);
 % Initialize nM EKF instances (l = 1,2,...,nM)
 for l = 1:nM
     EKF_instances(l).EKF_init(phase_measured,l,lambda,sigma_phi,weight_init);
+    
+    % saving the state
+    EKF_instances(l).state_history = [EKF_instances(l).state_history; EKF_instances(l).x];
 end
 
 rho_est = EKF_instances(nM).x(1);

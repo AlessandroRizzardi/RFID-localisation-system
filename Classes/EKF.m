@@ -12,7 +12,8 @@ properties
     P; % covariance matrix of the state
     weight; % weight of the EKF instance  
     weight_history; % history of the weights of the EKF instance   
-    state_history; % history of the states of the EKF instance         
+    state_history; % history of the states of the EKF instance 
+    innovation_history; % history of the innovations of the EKF instance        
 end % properties
 
 %  ____        _     _ _        __  __                _                                                             
@@ -30,6 +31,7 @@ methods
         obj.weight = 0;
         obj.weight_history = [];
         obj.state_history = []; 
+        obj.innovation_history = [];
     end
 
     % function that checks if the filter state has values and it is not NaN
@@ -57,7 +59,6 @@ methods
 
         obj.weight = weight_init;
         obj.weight_history = [obj.weight_history; obj.weight];
-        obj.state_history = [obj.state_history; obj.x];
 
     end
     
@@ -90,8 +91,6 @@ methods
         obj.x = [ro_next,beta_next];
         obj.P = P_next;
 
-        obj.state_history = [obj.state_history; obj.x];
-
     end
 
     % function that computes the correction step of the filter
@@ -111,6 +110,7 @@ methods
 
         innovation = phi_meas - phi_expected;
         innovation = atan2(sin(innovation),cos(innovation));
+        obj.innovation_history = [obj.innovation_history; innovation];
 
         x_next = [ro_curr;beta_curr] + Kalman_gain*(innovation);
 
@@ -125,8 +125,6 @@ methods
 
         obj.x = [ro_next,beta_next];
         obj.P = P_next;
-        
-        obj.state_history = [obj.state_history; obj.x];
     end
 
     % each EKF instance is weighed The weight is computed taking into account two kinds of metric computed 
