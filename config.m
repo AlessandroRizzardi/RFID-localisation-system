@@ -36,8 +36,8 @@ Kp_v2 = 0.1; % proportional parameters for PID the controller tag-pursuit
 Kp_w2= 0.2;
 
 
-x_range = [-5 5]; % [m] range of the map
-y_range = [-5 5]; % [m] range of the map
+x_range = [-15 15]; % [m] range of the map
+y_range = [-15 15]; % [m] range of the map
 
 method_paper = false;
 

@@ -60,6 +60,6 @@ end
 fprintf('           END SIMULATION\n')
 
 %%
-%final_plot
+final_plot
 
 fprintf('           END ANIMATION\n')

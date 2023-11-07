@@ -29,8 +29,8 @@ for k = 1:steps
     %legend('Odometry','Dynamics','Tag Position','Best estimation')
     xlabel('x [m]')
     ylabel('y [m]')
-    xlim([-3,3])
-    ylim([-3,3])
+    xlim([-5,5])
+    ylim([-5,5])
     title(['Step ', num2str(k)])
     pause(.01)
     
