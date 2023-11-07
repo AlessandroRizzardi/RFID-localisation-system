@@ -12,6 +12,8 @@ config
 
 initialization_vars
 
+fprintf('--------- Steps da fare: %d ---------\n\n',steps);
+
 for k = 1:steps
 
     if init == false && robot.inTagRange(tag_position, max_range) == true      % check if it is the first time the phase measurement is available
@@ -37,7 +39,7 @@ for k = 1:steps
 
     end
 
-    new_point = generateRandomPointInCircle([0,0], (x_range(2)-x_range(1)));
+    new_point = generateRandomPointInCircle([0,0], max_range);
     [v,omega] = move_robot(target_point, new_point, robot.x_est, Kp_v1, Kp_w1);
     % move robot
     x_next = robot.dynamics(v,omega);
@@ -46,10 +48,18 @@ for k = 1:steps
     odometry_estimation = robot.odometry_step(v,omega);
     odometry_history{k,1} = robot.x_est;
 
-    if mod(k,1000) == 0    
+    if mod(k,500) == 0    
         fprintf('--------- Step numero: %d ---------\n',k);
     end
 end
 
+% for l=1:nM
+%     innovations_history(l,:) = EKF_instances(l).innovation_history;
+% end
+
+fprintf('           END SIMULATION\n')
+
 %%
-final_plot
+%final_plot
+
+fprintf('           END ANIMATION\n')

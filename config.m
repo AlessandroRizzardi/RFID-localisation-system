@@ -3,7 +3,7 @@
 
 Tf = 20; % Total time [s]
 %Ts = 1; % Sampling time [s]
-dt = 10^-3; % integration-scheme timestep
+dt = 10^-2; % integration-scheme timestep
 
 
 f = 867*10^6; % [Hz] frequency of the reader
@@ -14,9 +14,9 @@ K = 2*pi/lambda;
 
 Ns = 50; % number of precedent steps used in MHEKF
 
-max_range = 6; % [m] maximum range of the reader
-%nM = ceil(max_range/(lambda/2)); % number of measurements
-nM = 10;
+max_range = 2; % [m] maximum range of the reader
+nM = ceil(max_range/(lambda/2)); % number of measurements
+%nM = 10;
 
 d = 0.5;   % [m] distance between the 2 wheels
 R = 0.2; % [m] radius of the wheels

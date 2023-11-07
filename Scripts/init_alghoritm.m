@@ -8,7 +8,10 @@ for l = 1:nM
     
     % saving the state
     EKF_instances(l).state_history = [EKF_instances(l).state_history; EKF_instances(l).x];
+    
 end
+
+
 
 rho_est = EKF_instances(nM).x(1);
 beta_est = EKF_instances(nM).x(2);

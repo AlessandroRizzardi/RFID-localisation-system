@@ -5,16 +5,24 @@ phase_history(k,1) = phase_measured;
 for l = 1:nM
     EKF_instances(l).EKF_predict(odometry_estimation, d);
     EKF_instances(l).EKF_correct(K, sigma_phi, phase_measured);
-    
-    weights_vec(l) = EKF_instances(l).weight;
 end
 
-weights_vec = weights_vec/sum(weights_vec); % Normalization of weights
+
+for l = 1:nM
+    weights_vec(l) = EKF_instances(l).weight;
+end
 
 for l = 1:nM
     EKF_instances(l).weight = EKF_instances(l).weight/sum(weights_vec);
 end
 
+for l = 1:nM
+    weights_vec(l) = EKF_instances(l).weight;
+end
+
+weights_sum(k) = sum(weights_vec);
+
+weights_history(:,k) = weights_vec;
 
 % Correction of non-positive range estimation and range estimation too low
 for l = 1:nM
