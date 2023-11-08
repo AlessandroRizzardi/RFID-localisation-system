@@ -11,6 +11,7 @@ for i = 1:length(odometry_history)
     y_dynamics(i) = dynamics_history{i,1}(2);
 end
 
+
 angle = 0:0.1:2*pi;
 rad = max_range; %[m]
 x_coord = tag_position(1) + rad*cos(angle);
@@ -21,17 +22,25 @@ for k = 1:steps
     figure(1)
     clf
     hold on
-    plot(x_odometry(k),y_odometry(k),'bo')
-    plot(x_dynamics(k),y_dynamics(k),'ro','MarkerSize', 10, 'LineWidth',2)
+    
     plot(tag_position(1),tag_position(2),'r*','MarkerSize',10)
-    plot(tag_estimation_history(k,1),tag_estimation_history(k,1),'b*','MarkerSize',10)
     plot(x_coord,y_coord, '--g');
+
+    for i=1:nRobots
+        plot(robots(i).odometry_history{k,1}(1), robots(i).odometry_history{k,1}(2),'bo')
+        plot(robots(i).dynamics_history{k,1}(1), robots(i).dynamics_history{k,1}(2), 'ro','MarkerSize', 10, 'LineWidth',2)
+
+        plot(robots(i).tag_estimation_history(k,1),tag_estimation_history(k,2),'b*', 'MarkerSize', 10)
+    end
+
+
+
     %legend('Odometry','Dynamics','Tag Position','Best estimation')
     xlabel('x [m]')
     ylabel('y [m]')
-    xlim([-5,5])
-    ylim([-5,5])
+    xlim([-20,20])
+    ylim([-20,20])
     title(['Step ', num2str(k)])
-    pause(.01)
+    pause(.001)
     
 end

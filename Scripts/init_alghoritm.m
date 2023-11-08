@@ -1,4 +1,7 @@
 % robot is inside the range of the tag
+tag_found_flag = true;
+tag_found_position = robots(i).x_est;
+
 robots(i).init = true;
 phase_measured = robots(i).phaseMeasured(tag_position, lambda , sigma_phi);
 
@@ -22,5 +25,13 @@ robots(i).best_tag_estimation(2) = robot(i).x_est(2) + rho_est*sin(robot(i).x_es
 robots(i).tag_estimation_history = [robot(i).tag_estimation_history; robots(i).best_tag_estimation(1), robots(i).best_tag_estimation(2)];
 
 
-%target_point = generateRandomPointInCircle([best_tag_estimation_x,best_tag_estimation_y], tag_window);
-%[v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
+targets(i) = robots(i).best_tag_estimation;
+target_point = targets(i);
+[v,omega] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2), robots(i).x_est);  
+
+
+x_next = robots(i).dynamics(v,omega);
+robots(i).dynamics_history{k,1} = x_next;
+
+odometry_estimation = robots(i).odometry_step(v,omega);
+robots(i).odometry_history{k,1} = robots(i).x_est;

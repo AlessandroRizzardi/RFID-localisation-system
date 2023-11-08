@@ -51,3 +51,13 @@ robots(i).best_tag_estimation(1) = robots(i).x_est(1) + rho_est*cos(robots(i).x_
 robots(i).best_tag_estimation(2) = robots(i).x_est(2) + rho_est*sin(robots(i).x_est(3) - beta_est);
 
 robots(i).tag_estimation_history = [tag_estimation_history; robots(i).best_tag_estimation(1), robots(i).best_tag_estimation(2)];
+
+targets(i) = robots(i).best_tag_estimation;
+target_point = targets(i);
+[v,omega] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2), robots(i).x_est); 
+
+x_next = robots(i).dynamics(v,omega);
+robots(i).dynamics_history{k,1} = x_next;
+
+odometry_estimation = robots(i).odometry_step(v,omega);
+robots(i).odometry_history{k,1} = robots(i).x_est;

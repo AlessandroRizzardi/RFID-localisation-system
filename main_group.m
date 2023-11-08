@@ -13,6 +13,7 @@ config
 % Define position of the tag
 tag_position = [6;6];
 tag_found_flag = false;
+tag_found_position = [0,0];
 
 nRobots = 3;
 
@@ -54,7 +55,7 @@ for k = 1:steps
 
             robots(i) = robots(i).steps_in_range + 1;
 
-        elseif robot.inTagRange(tag_position, max_range) == false                 % check if the robot is out of range of the tag
+        elseif robot.inTagRange(tag_position, max_range) == false   % check if the robot is out of range of the tag
         
             robots(i).steps_in_range = 0;
     
