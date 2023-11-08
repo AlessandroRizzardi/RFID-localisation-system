@@ -1,54 +1,53 @@
-phase_measured = robot.phaseMeasured(tag_position, lambda , sigma_phi);
-phase_history(k,1) = phase_measured;
+phase_measured = robot(i).phaseMeasured(tag_position, lambda , sigma_phi);
+% phase_history(k,1) = phase_measured; #TODO: check if this part is used somewhere different from euristic weighing algorithm
 
 % Prediction and Correction EKF
 for l = 1:nM
-    EKF_instances(l).EKF_predict(odometry_estimation, d);
-    EKF_instances(l).EKF_correct(K, sigma_phi, phase_measured);
+    MHEKFs(i,l).EKF_predict(odometry_estimation, d);
+    MHEKFs(i,l).EKF_correct(K, sigma_phi, phase_measured);
 end
 
 
 for l = 1:nM
-    weights_vec(l) = EKF_instances(l).weight;
+    weights_vec(l) = MHEKFs(i,l).weight;
 end
 
 for l = 1:nM
-    EKF_instances(l).weight = EKF_instances(l).weight/sum(weights_vec);
+    MHEKFs(i,l).weight = MHEKFs(i,l).weight/sum(robots(i).weights_vec);
 end
 
 for l = 1:nM
-    weights_vec(l) = EKF_instances(l).weight;
+    robots(i).weights_vec(l) = MHEKFs(i,l).weight;
 end
 
-weights_sum(k) = sum(weights_vec);
-
-weights_history(:,k) = weights_vec;
+%weights_sum(k) = sum(weights_vec); %vector used to check if the weights' sum is always zero at every step
+%weights_history(:,k) = weights_vec;
 
 % Correction of non-positive range estimation and range estimation too low
 for l = 1:nM
-    if EKF_instances(l).x(1) < 10^-6
-        number_states = length( EKF_instances(l).state_history);
-        EKF_instances(l).x(1) = max([abs(EKF_instances(l).state_history(max(1,number_states-5),1)),10^-6]); % I choose the range of 5 steps before
-        EKF_instances(l).x(2) = EKF_instances(l).state_history(max(1,number_states-5),2) + pi;
+    if MHEKFs(i,l).x(1) < 10^-6
+        number_states = length( MHEKFs(i,l).state_history);
+        MHEKFs(i,l).x(1) = max([abs(MHEKFs(i,l).state_history(max(1,number_states-5),1)),10^-6]); % I choose the range of 5 steps before
+        MHEKFs(i,l).x(2) = MHEKFs(i,l).state_history(max(1,number_states-5),2) + pi;
     end
-    EKF_instances(l).x(2) = atan2(sin(EKF_instances(l).x(2)),cos(EKF_instances(l).x(2)));
+    MHEKFs(i,l).x(2) = atan2(sin(MHEKFs(i,l).x(2)),cos(MHEKFs(i,l).x(2)));
 end
 
 
 % saving the state
 for l = 1:nM
-    EKF_instances(l).state_history = [EKF_instances(l).state_history; EKF_instances(l).x];
+    MHEKFs(i,l).state_history = [MHEKFs(i,l).state_history; MHEKFs(i,l).x];
 end
 
 % Weighing Step
-[max_value,instance_selected] = max(weights_vec);
+[max_value,instance_selected] = max(robots(i).weights_vec);
 
-rho_est = EKF_instances(instance_selected).x(1);
-beta_est = EKF_instances(instance_selected).x(2);
+rho_est = MHEKFs(i, robots(i).instance_selected).x(1);
+beta_est = MHEKFs(i, robots(i).instance_selected).x(2);
 
-best_state_estimate = [rho_est,beta_est];
+%best_state_estimate = [rho_est,beta_est];
 
-best_tag_estimation_x = robot.x_est(1) + rho_est*cos(robot.x_est(3) - beta_est);
-best_tag_estimation_y = robot.x_est(2) + rho_est*sin(robot.x_est(3) - beta_est);
+robots(i).best_tag_estimation(1) = robots(i).x_est(1) + rho_est*cos(robots(i).x_est(3) - beta_est);
+robots(i).best_tag_estimation(2) = robots(i).x_est(2) + rho_est*sin(robots(i).x_est(3) - beta_est);
 
-tag_estimation_history = [tag_estimation_history;best_tag_estimation_x,best_tag_estimation_y];
+robots(i).tag_estimation_history = [tag_estimation_history; robots(i).best_tag_estimation(1), robots(i).best_tag_estimation(2)];

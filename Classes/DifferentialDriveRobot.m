@@ -18,6 +18,19 @@ classdef DifferentialDriveRobot < handle
         KR;
         dt;
 
+        instance_selected;
+        steps_in_range;
+        weights_vec;
+        
+        best_tag_estimation;
+
+        dynamics_history;
+        odometry_history;
+        tag_estimation_history;
+
+        init_flag;
+
+
     end % properties
 
     %  ____        _     _ _        __  __                _                                                             
@@ -30,7 +43,7 @@ classdef DifferentialDriveRobot < handle
     % here we firstly define the functions that are intended to be called in the main program                                                                                                                   
     methods 
 
-        function obj = DifferentialDriveRobot(initial_state, R, d, KR, KL, dt) % constructor
+        function obj = DifferentialDriveRobot(initial_state, R, d, KR, KL, dt, nM) % constructor
             obj.x = zeros(3,1);
             obj.x(1) = initial_state(1);
             obj.x(2) = initial_state(2);
@@ -47,6 +60,19 @@ classdef DifferentialDriveRobot < handle
 
             obj.dt = dt; % integration-scheme time step
 
+            obj.instance_selected = 0;
+            obj.steps_in_range = 0;
+
+            obj.weights_vec = (1/nM) *ones(nM,1);
+
+            obj.best_tag_estimation = [NaN,NaN];
+
+            obj.dynamics_history = {};
+            obj.odometry_history = {};
+            obj.tag_estimation_history = {};
+
+
+            obj.init_flag = false;
         end
 
         function state = get_state(obj)

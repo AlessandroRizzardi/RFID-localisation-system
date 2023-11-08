@@ -41,6 +41,7 @@ for k = 1:steps
 
     new_point = generateRandomPointInCircle([0,0], max_range);
     [v,omega] = move_robot(target_point, new_point, robot.x_est, Kp_v1, Kp_w1);
+
     % move robot
     x_next = robot.dynamics(v,omega);
     dynamics_history{k,1} = x_next;
@@ -63,3 +64,6 @@ fprintf('           END SIMULATION\n')
 final_plot
 
 fprintf('           END ANIMATION\n')
+
+
+weights_vec = zeros(n)
