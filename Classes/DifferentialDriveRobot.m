@@ -157,6 +157,10 @@ classdef DifferentialDriveRobot < handle
             
         end
 
+        function distance = distanceFromPoint(obj, point)
+            distance = sqrt((obj.x_est(1) - point(1))^2 + (obj.x_est(2) - point(2))^2);
+        end
+
 
     end % methods
 

@@ -2,8 +2,8 @@
 %phase_history(k,1) = 0;
 
 if tag_found_flag == false
-   if robots(i).inTagRange(targets(i,:)) <= 0.3
-    targets(i,:) = generateRandomPointInCircle([0,0],(x_range(2) - x_range(1))/2);
+   if robots(i).distanceFromPoint(targets(i,:)) <= 0.3 
+    targets(i,:) = generateRandomPointInCircle([0,0],radius_map);
    end
 
    target_point = targets(i,:);
@@ -11,17 +11,19 @@ if tag_found_flag == false
 
 elseif tag_found_flag == true
 
-    targets(i,:) = tag_found_position;
+    if isnan(robots(i).best_tag_estimation(1))
+        targets(i,:) = tag_found_position;
+    else
+        targets(i,:) = robots(i).best_tag_estimation;
+    end
 
     target_point = targets(i,:);
     [v,omega] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2), robots(i).x_est);  
 
 end
 
-x_next = robots(i).dynamics(v,omega);
-robots(i).dynamics_history{k,1} = x_next;
+robots(i).tag_estimation_history = [robots(i).tag_estimation_history; NaN, NaN];
 
-odometry_estimation = robots(i).odometry_step(v,omega);
-robots(i).odometry_history{k,1} = robots(i).x_est;
+
 
 

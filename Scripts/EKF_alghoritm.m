@@ -1,4 +1,4 @@
-phase_measured = robot(i).phaseMeasured(tag_position, lambda , sigma_phi);
+phase_measured = robots(i).phaseMeasured(tag_position, lambda , sigma_phi);
 % phase_history(k,1) = phase_measured; #TODO: check if this part is used somewhere different from euristic weighing algorithm
 
 % Prediction and Correction EKF
@@ -9,7 +9,7 @@ end
 
 
 for l = 1:nM
-    weights_vec(l) = MHEKFs(i,l).weight;
+    robots(i).weights_vec(l) = MHEKFs(i,l).weight;
 end
 
 for l = 1:nM
@@ -19,9 +19,6 @@ end
 for l = 1:nM
     robots(i).weights_vec(l) = MHEKFs(i,l).weight;
 end
-
-%weights_sum(k) = sum(weights_vec); %vector used to check if the weights' sum is always zero at every step
-%weights_history(:,k) = weights_vec;
 
 % Correction of non-positive range estimation and range estimation too low
 for l = 1:nM
@@ -42,6 +39,8 @@ end
 % Weighing Step
 [max_value,instance_selected] = max(robots(i).weights_vec);
 
+robots(i).instance_selected = instance_selected;
+
 rho_est = MHEKFs(i, robots(i).instance_selected).x(1);
 beta_est = MHEKFs(i, robots(i).instance_selected).x(2);
 
@@ -50,14 +49,12 @@ beta_est = MHEKFs(i, robots(i).instance_selected).x(2);
 robots(i).best_tag_estimation(1) = robots(i).x_est(1) + rho_est*cos(robots(i).x_est(3) - beta_est);
 robots(i).best_tag_estimation(2) = robots(i).x_est(2) + rho_est*sin(robots(i).x_est(3) - beta_est);
 
-robots(i).tag_estimation_history = [tag_estimation_history; robots(i).best_tag_estimation(1), robots(i).best_tag_estimation(2)];
+robots(i).tag_estimation_history = [robots(i).tag_estimation_history; robots(i).best_tag_estimation(1), robots(i).best_tag_estimation(2)];
 
-targets(i,:) = robots(i).best_tag_estimation;
+if robots(i).distanceFromPoint(targets(i,:)) <= 0.3
+    targets(i,:) = generateRandomPointInCircle(robots(i).best_tag_estimation, max_range);
+end
+
 target_point = targets(i,:);
 [v,omega] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2), robots(i).x_est); 
 
-x_next = robots(i).dynamics(v,omega);
-robots(i).dynamics_history{k,1} = x_next;
-
-odometry_estimation = robots(i).odometry_step(v,omega);
-robots(i).odometry_history{k,1} = robots(i).x_est;

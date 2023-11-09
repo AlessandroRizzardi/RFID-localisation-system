@@ -16,12 +16,12 @@ fprintf('--------- Steps da fare: %d ---------\n\n',steps);
 
 for k = 1:steps
 
-    if init == false && robot.inTagRange(tag_position, max_range) == true      % check if it is the first time the phase measurement is available
+    if init == false && robot.inPointRange(tag_position, max_range) == true      % check if it is the first time the phase measurement is available
         fprintf('--------- Entering range in Step numero: %d ---------\n',k);
 
         init_alghoritm           %initialize MHEKF instances
    
-    elseif init == true && robot.inTagRange(tag_position, max_range) == true   % check if the robot is still in range of the tag
+    elseif init == true && robot.inPointRange(tag_position, max_range) == true   % check if the robot is still in range of the tag
 
         EKF_alghoritm            % performing prediction and correction and chooses an estimate between the multiple hypotesis
         
@@ -31,7 +31,7 @@ for k = 1:steps
 
         steps_in_range = steps_in_range + 1;
 
-    elseif  robot.inTagRange(tag_position, max_range) == false                 % check if the robot is out of range of the tag
+    elseif  robot.inPointRange(tag_position, max_range) == false                 % check if the robot is out of range of the tag
         
         steps_in_range = 0;
 
