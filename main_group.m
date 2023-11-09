@@ -38,7 +38,7 @@ target_point1 = generateRandomPointInCircle([0,0],(x_range(2) - x_range(1))/2);
 target_point2 = generateRandomPointInCircle([0,0],(x_range(2) - x_range(1))/2);
 target_point3 = generateRandomPointInCircle([0,0],(x_range(2) - x_range(1))/2);
 
-targets = [target_point1, target_point2, target_point3];
+targets = [target_point1; target_point2; target_point3];
 
 fprintf('--------- Steps da fare: %d ---------\n\n',steps);
 
@@ -49,13 +49,13 @@ for k = 1:steps
             
             init_alghoritm
         
-        elseif init == true && robot.inTagRange(tag_position, max_range) == true
+        elseif robots(i).init_flag && robots(i).inTagRange(tag_position, max_range) == true
 
             EKF_alghoritm
 
             robots(i) = robots(i).steps_in_range + 1;
 
-        elseif robot.inTagRange(tag_position, max_range) == false   % check if the robot is out of range of the tag
+        elseif robots(i).inTagRange(tag_position, max_range) == false   % check if the robot is out of range of the tag
         
             robots(i).steps_in_range = 0;
     

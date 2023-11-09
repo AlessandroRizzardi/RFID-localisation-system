@@ -25,8 +25,8 @@ robots(i).best_tag_estimation(2) = robot(i).x_est(2) + rho_est*sin(robot(i).x_es
 robots(i).tag_estimation_history = [robot(i).tag_estimation_history; robots(i).best_tag_estimation(1), robots(i).best_tag_estimation(2)];
 
 
-targets(i) = robots(i).best_tag_estimation;
-target_point = targets(i);
+targets(i,:) = robots(i).best_tag_estimation;
+target_point = targets(i,:);
 [v,omega] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2), robots(i).x_est);  
 
 
