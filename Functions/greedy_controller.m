@@ -10,5 +10,6 @@ function [v,omega] = greedy_controller(Kp_v,Kp_w, x_target, y_target, odometry_s
     omega = Kp_w*error_heading;
     
     dist = sqrt((y_target - y_odometry)^2 + (x_target - x_odometry)^2); 
-    v = Kp_v * dist;
+    %v = Kp_v * dist;
+    v = 3;
 end

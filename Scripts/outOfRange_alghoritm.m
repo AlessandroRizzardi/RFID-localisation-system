@@ -24,6 +24,7 @@ end
 
 robots(i).tag_estimation_history = [robots(i).tag_estimation_history; NaN, NaN];
 
+robots(i).init_flag = false;
 
 
 

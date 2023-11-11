@@ -1,7 +1,7 @@
 % This files contains all the parameters used while running the SLAM algorithms
 
 
-Tf = 120; % Total time [s]
+Tf = 40; % Total time [s]
 %Ts = 1; % Sampling time [s]
 dt = 10^-2; % integration-scheme timestep
 
@@ -26,14 +26,13 @@ KR = 0.01*10^-2;
 
 sigma_phi = 0.2; % [rad] standard deviation of the angle measurement
 
-c1 = 0.0005; % parameter for computing weight of each instance
-c2 = 0.0001; % parameter for computing weight of each instance
 
 Kp_v1 = 0.8; % proportional parameters for PID the controller pure-pursuit
 Kp_w1= 2;
 
-Kp_v2 = 0.1; % proportional parameters for PID the controller tag-pursuit
-Kp_w2= 0.2;
+% NOT USED AT THE MOMENT
+%Kp_v2 = 0.1; % proportional parameters for PID the controller tag-pursuit
+%Kp_w2= 0.2;
 
 
 x_range = [-5 5]; % [m] range of the map

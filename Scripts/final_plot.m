@@ -19,17 +19,17 @@ if ANIMATION == true
         plot(tag_position(1),tag_position(2),'r*','MarkerSize',10)
         plot(x_coord,y_coord, '--g');
         
- 
-        plot(robots(1).odometry_history{k,1}(1), robots(1).odometry_history{k,1}(2), 'ro')
-        plot(robots(1).dynamics_history{k,1}(1), robots(1).dynamics_history{k,1}(2),'bo','MarkerSize', 10, 'LineWidth',2)
-        plot(robots(1).tag_estimation_history{k}(1), robots(1).tag_estimation_history{k}(2), 'y*', 'MarkerSize', 10)
-            
+        for i=1:nRobots
+            plot(robots(i).odometry_history{k,1}(1), robots(i).odometry_history{k,1}(2), 'ro')
+            plot(robots(i).dynamics_history{k,1}(1), robots(i).dynamics_history{k,1}(2),'bo','MarkerSize', 10, 'LineWidth',2)
+            plot(robots(i).tag_estimation_history{k}(1), robots(i).tag_estimation_history{k}(2), 'c*', 'MarkerSize', 10)
+        end    
     
         xlabel('x [m]')
         ylabel('y [m]')
 
-        xlim([-20,20])
-        ylim([-20,20])
+        xlim([-5, 5])
+        ylim([-5, 5])
 
         title(['Step ', num2str(k)])
         pause(.001)
