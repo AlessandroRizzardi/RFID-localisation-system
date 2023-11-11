@@ -5,11 +5,11 @@ y_coord = tag_position(2) + rad*sin(angle);
 
 
 
- % Animations
- color_drawing = ['r--'; 'b--' ;'g--'];
- color_animation = ['ro'; 'bo' ;'go'];
- color_tag = ['r*'; 'b*' ;'g*'];
+color_drawing = ['r--'; 'b--' ;'g--'];
+color_animation = ['ro'; 'bo' ;'go'];
+color_tag = ['r*'; 'b*' ;'g*'];
 
+% Animations
 if ANIMATION == true
     for k = 1:steps
         figure(1)
@@ -18,16 +18,13 @@ if ANIMATION == true
 
         plot(tag_position(1),tag_position(2),'r*','MarkerSize',10)
         plot(x_coord,y_coord, '--g');
-
-        for i=1:nRobots
-            plot(robots(i).odometry_history{k,1}(1), robots(i).odometry_history{k,1}(2), color_animation(i))
-            plot(robots(i).dynamics_history{k,1}(1), robots(i).dynamics_history{k,1}(2), color_animation(i),'MarkerSize', 10, 'LineWidth',2)
-
+        
+ 
+        plot(robots(1).odometry_history{k,1}(1), robots(1).odometry_history{k,1}(2), 'ro')
+        plot(robots(1).dynamics_history{k,1}(1), robots(1).dynamics_history{k,1}(2),'bo','MarkerSize', 10, 'LineWidth',2)
+        plot(robots(1).tag_estimation_history{k}(1), robots(1).tag_estimation_history{k}(2), 'y*', 'MarkerSize', 10)
             
-                plot(robots(i).tag_estimation_history{k}(1), robots(i).tag_estimation_history{k}(2),color_tag(i), 'MarkerSize', 10)
-            
-        end
-
+    
         xlabel('x [m]')
         ylabel('y [m]')
 

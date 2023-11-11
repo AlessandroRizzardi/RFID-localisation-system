@@ -13,7 +13,7 @@ config
 %%%%%%%%%%  SETTINGS    %%%%%%%%%%%%%
 % Define position of the tag
 tag_position = [3;3];
-nRobots = 3;
+nRobots = 1;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
 %%
@@ -25,7 +25,7 @@ tag_found_position = [0,0];
 robot1 = DifferentialDriveRobot([0;0;0],R,d,KR,KL,dt,nM);
 robot2 = DifferentialDriveRobot([1;1;0],R,d,KR,KL,dt,nM);
 robot3 = DifferentialDriveRobot([-2;-4;0],R,d,KR,KL,dt,nM);
-robots = [robot1,robot2, robot3];
+robots = [robot1];
 
 % 3x10 matrix
 for i=1:nRobots
@@ -42,7 +42,7 @@ target_point1 = generateRandomPointInCircle([0,0],(x_range(2) - x_range(1))/2);
 target_point2 = generateRandomPointInCircle([0,0],(x_range(2) - x_range(1))/2);
 target_point3 = generateRandomPointInCircle([0,0],(x_range(2) - x_range(1))/2);
 
-targets = [target_point1; target_point2; target_point3];
+targets = [target_point1];
 
 fprintf('--------- Steps da fare: %d ---------\n\n',steps);
 
@@ -86,8 +86,8 @@ end
 fprintf('           END SIMULATION\n')
 
 %%
-ANIMATION = false;
-DRAW = true;
+ANIMATION = true;
+DRAW = false;
 
 final_plot
 
