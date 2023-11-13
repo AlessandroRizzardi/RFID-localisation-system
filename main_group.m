@@ -16,8 +16,6 @@ tag_position = [3;3];
 nRobots = 3;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
-%%
-
 tag_found_flag = false;
 tag_found_position = [0,0];
 
@@ -26,6 +24,7 @@ robot1 = DifferentialDriveRobot([0;0;0],R,d,KR,KL,dt,nM);
 robot2 = DifferentialDriveRobot([1;1;0],R,d,KR,KL,dt,nM);
 robot3 = DifferentialDriveRobot([-2;-4;0],R,d,KR,KL,dt,nM);
 robots = [robot1, robot2, robot3];
+%robots = [robot1];
 
 % 3x10 matrix
 for i=1:nRobots
@@ -38,11 +37,14 @@ steps = Tf/dt;
 
 % 1st virtual target point
 % random number between -5 and 5
-target_point1 = generateRandomPointInCircle([0,0],(x_range(2) - x_range(1))/2);
-target_point2 = generateRandomPointInCircle([0,0],(x_range(2) - x_range(1))/2);
-target_point3 = generateRandomPointInCircle([0,0],(x_range(2) - x_range(1))/2);
-
+target_point1 = generateRandomPointInCircle([5,5],(x_range(2) - x_range(1))/2);
+target_point2 = generateRandomPointInCircle([5,5],(x_range(2) - x_range(1))/2);
+target_point3 = generateRandomPointInCircle([5,5],(x_range(2) - x_range(1))/2);
 targets = [target_point1; target_point2; target_point3];
+
+%target_point1 = [5,5];
+%targets = [target_point1];
+
 
 fprintf('--------- Steps da fare: %d ---------\n\n',steps);
 
@@ -86,8 +88,8 @@ end
 fprintf('           END SIMULATION\n')
 
 %%
-ANIMATION = true;
-DRAW = false;
+ANIMATION = false;
+DRAW = true;
 
 final_plot
 

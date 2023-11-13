@@ -11,20 +11,19 @@ if tag_found_flag == false
 
 elseif tag_found_flag == true
 
-    if isnan(robots(i).best_tag_estimation(1))
-        targets(i,:) = tag_found_position;
-    else
-        targets(i,:) = robots(i).best_tag_estimation;
-    end
+
+    targets(i,:) = tag_found_position;
 
     target_point = targets(i,:);
     [v,omega] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2), robots(i).x_est);  
 
 end
-
+    
 robots(i).tag_estimation_history = [robots(i).tag_estimation_history; NaN, NaN];
 
 robots(i).init_flag = false;
 
 
 
+%TODO: keep track of steps in range for every robot and if a robot was in the range for more than TOT steps
+%      then the target point is the best tag estimation he has and not the tag_found_position as it is now
