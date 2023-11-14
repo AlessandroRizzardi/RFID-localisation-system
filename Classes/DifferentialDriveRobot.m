@@ -30,6 +30,8 @@ classdef DifferentialDriveRobot < handle
 
         init_flag;
 
+        odometry_estimation;
+
 
     end % properties
 
@@ -73,6 +75,9 @@ classdef DifferentialDriveRobot < handle
 
 
             obj.init_flag = false;
+
+            obj.odometry_estimation = {[0,0], diag([0,0])};
+
         end
 
         function state = get_state(obj)
@@ -110,7 +115,10 @@ classdef DifferentialDriveRobot < handle
             
             Q = [obj.KR * abs(uR) , 0 ; 0, obj.KL*abs(uL)];
 
-            odometry_estimation = {[u_est,omega_est],Q}; 
+            obj.odometry_estimation = {[u_est,omega_est],Q}; 
+            odometry_estimation = obj.odometry_estimation;
+
+    
         end
 
         function inRange = inTagRange(obj,tag_position, max_range)

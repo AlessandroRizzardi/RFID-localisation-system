@@ -13,17 +13,24 @@ config
 %%%%%%%%%%  SETTINGS    %%%%%%%%%%%%%
 % Define position of the tag
 tag_position = [3;3];
-nRobots = 3;
+nRobots = 2;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
 tag_found_flag = false;
 tag_found_position = [0,0];
 
+robots = [];
+for i=1:nRobots
+    random_initial_position = generateRandomPointInCircle([0,0], (x_range(2) - x_range(1))/2); 
+    robot = DifferentialDriveRobot([random_initial_position(1); random_initial_position(2); 0],R,d,KR,KL,dt,nM);
+    robots = [robots, robot];
+end
+
 % Initialize the robot
-robot1 = DifferentialDriveRobot([0;0;0],R,d,KR,KL,dt,nM);
-robot2 = DifferentialDriveRobot([1;1;0],R,d,KR,KL,dt,nM);
-robot3 = DifferentialDriveRobot([-2;-4;0],R,d,KR,KL,dt,nM);
-robots = [robot1, robot2, robot3];
+%robot1 = DifferentialDriveRobot([0;0;0],R,d,KR,KL,dt,nM);
+%robot2 = DifferentialDriveRobot([1;1;0],R,d,KR,KL,dt,nM);
+%robot3 = DifferentialDriveRobot([-2;-4;0],R,d,KR,KL,dt,nM);
+%robots = [robot1, robot2, robot3];
 %robots = [robot1];
 
 % 3x10 matrix
@@ -35,15 +42,12 @@ end
 
 steps = Tf/dt;
 
-% 1st virtual target point
-% random number between -5 and 5
-target_point1 = generateRandomPointInCircle([5,5],(x_range(2) - x_range(1))/2);
-target_point2 = generateRandomPointInCircle([5,5],(x_range(2) - x_range(1))/2);
-target_point3 = generateRandomPointInCircle([5,5],(x_range(2) - x_range(1))/2);
-targets = [target_point1; target_point2; target_point3];
-
-%target_point1 = [5,5];
-%targets = [target_point1];
+% 1st virtual target points
+targets = [];
+for i=1:nRobots
+    target = generateRandomPointInCircle([3,3],2);
+    targets = [targets; target];
+end
 
 
 fprintf('--------- Steps da fare: %d ---------\n\n',steps);
@@ -74,7 +78,7 @@ for k = 1:steps
         x_next = robots(i).dynamics(v,omega);
         robots(i).dynamics_history{k,1} = x_next;
 
-        odometry_estimation = robots(i).odometry_step(v,omega);
+        robots(i).odometry_estimation = robots(i).odometry_step(v,omega);
         robots(i).odometry_history{k,1} = robots(i).x_est;
         
     end
@@ -88,9 +92,12 @@ end
 fprintf('           END SIMULATION\n')
 
 %%
-ANIMATION = false;
+
+ANIMATION = true;
 DRAW = true;
 
+tic
 final_plot
+toc
 
 fprintf('           END ANIMATION\n')

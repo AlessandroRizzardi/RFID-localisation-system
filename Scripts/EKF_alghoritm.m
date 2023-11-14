@@ -3,7 +3,7 @@ phase_measured = robots(i).phaseMeasured(tag_position, lambda , sigma_phi);
 
 % Prediction and Correction EKF
 for l = 1:nM
-    MHEKFs(i,l).EKF_predict(odometry_estimation, d);
+    MHEKFs(i,l).EKF_predict(robots(i).odometry_estimation, d);
     MHEKFs(i,l).EKF_correct(K, sigma_phi, phase_measured);
 end
 
@@ -39,10 +39,10 @@ end
 % Weighing Step
 [max_value,instance_selected] = max(robots(i).weights_vec);
 
-robots(i).instance_selected = instance_selected;
+%robots(i).instance_selected = instance_selected;
 
-rho_est = MHEKFs(i, robots(i).instance_selected).x(1);
-beta_est = MHEKFs(i, robots(i).instance_selected).x(2);
+rho_est = MHEKFs(i, instance_selected).x(1);
+beta_est = MHEKFs(i, instance_selected).x(2);
 
 %best_state_estimate = [rho_est,beta_est];
 
@@ -52,7 +52,7 @@ robots(i).best_tag_estimation(2) = robots(i).x_est(2) + rho_est*sin(robots(i).x_
 robots(i).tag_estimation_history = [robots(i).tag_estimation_history; robots(i).best_tag_estimation(1), robots(i).best_tag_estimation(2)];
 
 if robots(i).distanceFromPoint(targets(i,:)) <= 0.3
-    targets(i,:) = generateRandomPointInCircle(robots(i).best_tag_estimation, max_range);
+    targets(i,:) = generateRandomPointInCircle(robots(i).best_tag_estimation, 0.65 *max_range);
 end
 
 target_point = targets(i,:);
