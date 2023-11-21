@@ -48,6 +48,8 @@ fprintf('--------- Steps da fare: %d ---------\n\n',steps);
 
 for k = 1:steps
 
+    %COMMENTO PROVA
+
     for i=1:length(robots)
         
         if robots(i).init_flag == false && robots(i).inTagRange(tag_position,max_range) == true
