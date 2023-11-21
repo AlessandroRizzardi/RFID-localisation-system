@@ -19,19 +19,13 @@ nRobots = 2;
 tag_found_flag = false;
 tag_found_position = [0,0];
 
+% Initialize the swarm
 robots = [];
 for i=1:nRobots
     random_initial_position = generateRandomPointInCircle([0,0], (x_range(2) - x_range(1))/2); 
     robot = DifferentialDriveRobot([random_initial_position(1); random_initial_position(2); 0],R,d,KR,KL,dt,nM);
     robots = [robots, robot];
 end
-
-% Initialize the robot
-%robot1 = DifferentialDriveRobot([0;0;0],R,d,KR,KL,dt,nM);
-%robot2 = DifferentialDriveRobot([1;1;0],R,d,KR,KL,dt,nM);
-%robot3 = DifferentialDriveRobot([-2;-4;0],R,d,KR,KL,dt,nM);
-%robots = [robot1, robot2, robot3];
-%robots = [robot1];
 
 % 3x10 matrix
 for i=1:nRobots
@@ -45,7 +39,7 @@ steps = Tf/dt;
 % 1st virtual target points
 targets = [];
 for i=1:nRobots
-    target = generateRandomPointInCircle([3,3],2);
+    target = generateRandomPointInCircle([3,3],2); % actually set to go towards the target, change for real simulation
     targets = [targets; target];
 end
 
@@ -88,16 +82,12 @@ for k = 1:steps
     end
 end
 
-
 fprintf('           END SIMULATION\n')
-
 %%
 
 ANIMATION = true;
 DRAW = true;
 
-tic
 final_plot
-toc
 
 fprintf('           END ANIMATION\n')
