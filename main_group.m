@@ -48,7 +48,14 @@ fprintf('--------- Steps da fare: %d ---------\n\n',steps);
 
 for k = 1:steps
 
-    %COMMENTO PROVA
+    phases = [];
+
+    for i=1:length(robots)
+        if robots(i).inTagRange(tag_position, max_range) == true 
+            robots(i).phaseMeasured(tag_position, lambda , sigma_phi);
+            phases = [phases; robots(i).phase_measured];
+        end
+    end
 
     for i=1:length(robots)
         

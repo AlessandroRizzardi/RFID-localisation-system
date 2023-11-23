@@ -94,28 +94,36 @@ methods
     end
 
     % function that computes the correction step of the filter
-    function EKF_correct(obj, K, sigma_phi, phi_meas) % constructor
+    function EKF_correct(obj, K, sigma_phi, phases, phi_meas_actual) % constructor
         
         ro_curr = obj.x(1);
         beta_curr = obj.x(2);
         P_curr = obj.P;
 
-        R = sigma_phi^2;
+        x_curr = [ro_curr; beta_curr];
 
+        R = sigma_phi^2;
         H = [-2*K, 0];
         
-        Kalman_gain = P_curr*H'*pinv(H*P_curr*H' + R);
+        a = 0;
+        for i = 1:length(phases)
+            a = a + H'*inv(R)*phases(i);
+        end
+
+        F = 0;
+        for i = 1:length(phases)
+            F = F + H'*inv(R)*H;
+        end
+
+        P_next = inv(P_curr + F);
+        x_next = P_next*(P_curr*x_curr + a);
+        
 
         phi_expected = mod(-2*K*ro_curr,2*pi);
 
-        innovation = phi_meas - phi_expected;
-        innovation = atan2(sin(innovation),cos(innovation));
-        obj.innovation_history = [obj.innovation_history; innovation];
-
-        x_next = [ro_curr;beta_curr] + Kalman_gain*(innovation);
-
-        P_next = (eye(2) - Kalman_gain*H)*P_curr;
-
+        innovation = phi_meas_actual - phi_expected;
+        innovation = atan2(sin(innovation),cos(innovation));           
+        
         ro_next = x_next(1);
         beta_next = x_next(2);
 

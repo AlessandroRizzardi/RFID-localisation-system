@@ -1,10 +1,10 @@
-phase_measured = robots(i).phaseMeasured(tag_position, lambda , sigma_phi);
+%phase_measured = robots(i).phaseMeasured(tag_position, lambda , sigma_phi);
 % phase_history(k,1) = phase_measured; #TODO: check if this part is used somewhere different from euristic weighing algorithm
 
 % Prediction and Correction EKF
 for l = 1:nM
     MHEKFs(i,l).EKF_predict(robots(i).odometry_estimation, d);
-    MHEKFs(i,l).EKF_correct(K, sigma_phi, phase_measured);
+    MHEKFs(i,l).EKF_correct(K, sigma_phi, phase_measured, robots(i).phase_measured);
 end
 
 

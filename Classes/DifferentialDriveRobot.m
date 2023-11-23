@@ -32,6 +32,8 @@ classdef DifferentialDriveRobot < handle
 
         odometry_estimation;
 
+        phase_measured;
+
 
     end % properties
 
