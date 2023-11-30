@@ -83,6 +83,8 @@ for k = 1:steps
 
         robots(i).odometry_estimation = robots(i).odometry_step(v,omega);
         robots(i).odometry_history{k,1} = robots(i).x_est;
+
+        robots(i).covariance_update();
         
     end
 
@@ -94,7 +96,7 @@ end
 fprintf('           END SIMULATION\n')
 %%
 
-ANIMATION = true;
+ANIMATION = false;
 DRAW = true;
 
 final_plot

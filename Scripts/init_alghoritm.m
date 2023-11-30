@@ -3,14 +3,14 @@ tag_found_flag = true;
 tag_found_position = [robots(i).x_est(1), robots(i).x_est(2)];
 
 robots(i).init_flag = true;
-phase_measured = robots(i).phaseMeasured(tag_position, lambda , sigma_phi);
+%phase_measured = robots(i).phaseMeasured(tag_position, lambda , sigma_phi);
 
 % Initialize nM EKF instances (l = 1,2,...,nM)
 for l = 1:nM
-    MHEKFs(i,l).EKF_init(phase_measured,l,lambda,sigma_phi,weight_init);
+    MHEKFs(i,l).EKF_init(robots(i).phase_measured,l,lambda,sigma_phi,weight_init, robots(i).x_est, robots(i).covariance_matrix);
     
     % saving the state
-    MHEKFs(i,l).state_history = [MHEKFs(i,l).state_history; MHEKFs(i,l).x];
+    MHEKFs(i,l).state_history = [MHEKFs(i,l).state_history; MHEKFs(i,l).x(1), MHEKFs(i,l).x(2)];
     
 end
 

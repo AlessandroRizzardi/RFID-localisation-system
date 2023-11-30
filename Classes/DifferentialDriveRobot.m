@@ -34,6 +34,8 @@ classdef DifferentialDriveRobot < handle
 
         phase_measured;
 
+        covariance_matrix;
+
 
     end % properties
 
@@ -80,6 +82,8 @@ classdef DifferentialDriveRobot < handle
 
             obj.odometry_estimation = {[0,0], diag([0,0])};
 
+            obj.covariance_matrix = zeros(3,3);
+
         end
 
         function state = get_state(obj)
@@ -123,6 +127,27 @@ classdef DifferentialDriveRobot < handle
     
         end
 
+        function covariance_update(obj) % constructor
+            % initialize cell array encoder readings
+    
+            u = obj.odometry_estimation{1,1}(1);
+            Q = obj.odometry_estimation{1,2};
+    
+            % A, G are respectively Jacobian matrices of the state dynamics with respect to the state and the encoder noise
+            A = [
+                 1, 0, -u*sin(obj.x(3));...
+                 0, 1,  u*cos(obj.x(3));...
+                 0, 0,  1             ];
+    
+            G = [0.5*cos(obj.x(3)), 0.5*cos(obj.x(3));...
+                 0.5*sin(obj.x(3)), 0.5*sin(obj.x(3));... 
+                 1/obj.d          , -1/obj.d        ];
+            
+            obj.covariance_matrix = A*obj.covariance_matrix*A' + G*Q*G';
+
+    
+        end
+
         function inRange = inTagRange(obj,tag_position, max_range)
             dist = obj.getTagDistance(tag_position);
 
@@ -133,12 +158,12 @@ classdef DifferentialDriveRobot < handle
             end
         end
 
-        function phase_measured = phaseMeasured(obj, tag_position, lambda , sigma_phi)
+        function phaseMeasured(obj, tag_position, lambda , sigma_phi)
             distance = obj.getTagDistance(tag_position);
         
             phase = (distance * 4 * pi)/lambda;
 
-            phase_measured = mod(-phase + normrnd(0,sigma_phi) , 2*pi) ;
+            obj.phase_measured = mod(-phase + normrnd(0,sigma_phi) , 2*pi) ;
 
         end
 

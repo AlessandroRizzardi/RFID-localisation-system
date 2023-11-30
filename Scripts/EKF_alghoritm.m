@@ -4,7 +4,7 @@
 % Prediction and Correction EKF
 for l = 1:nM
     MHEKFs(i,l).EKF_predict(robots(i).odometry_estimation, d);
-    MHEKFs(i,l).EKF_correct(K, sigma_phi, phase_measured, robots(i).phase_measured);
+    MHEKFs(i,l).EKF_correct(K, sigma_phi, robots(i).phase_measured);
 end
 
 
@@ -33,7 +33,7 @@ end
 
 % saving the state
 for l = 1:nM
-    MHEKFs(i,l).state_history = [MHEKFs(i,l).state_history; MHEKFs(i,l).x];
+    MHEKFs(i,l).state_history = [MHEKFs(i,l).state_history; MHEKFs(i,l).x(1), MHEKFs(i,l).x(2)];
 end
 
 % Weighing Step

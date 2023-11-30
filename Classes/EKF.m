@@ -8,7 +8,7 @@ classdef EKF < handle
 %                                                 
 properties 
 
-    x; % filter of the state (ro, beta)
+    x; % filter of the state (ro, beta,x_robot, y_robot, theta_robot)
     P; % covariance matrix of the state
     weight; % weight of the EKF instance  
     weight_history; % history of the weights of the EKF instance   
@@ -26,43 +26,40 @@ methods
 
     % Constructor 
     function obj = EKF() % constructor
-        obj.x = zeros(2,1);
-        obj.P = zeros(2,2);
+        obj.x = zeros(5,1);
+        obj.P = zeros(5,5);
         obj.weight = 0;
         obj.weight_history = [];
         obj.state_history = []; 
         obj.innovation_history = [];
     end
 
-    % function that checks if the filter state has values and it is not NaN
-    function error_state = check_state(obj)
-        if isnan(obj.x) == true
-            error_state = true;
-        end
-        error_state = false;
-    end
-    
-
     % Constructor that corresponds to initialization step of the filter
     % z0 is the measurement at time 0
-    function EKF_init(obj,phi_0, l, lambda, sigma_phi,weight_init) % constructor
+    function EKF_init(obj,phi_0, l, lambda, sigma_phi,weight_init, robot_pose, robot_cov_matrix) % constructor
               
-        
         K = (2*pi)/lambda;
         ro_0 = -phi_0/(2*K) + (l*lambda)/2;
         beta_0 = 0;
+        x_0 = robot_pose(1);
+        y_0 = robot_pose(2);
+        theta_0 = robot_pose(3);
 
-        obj.x = [ro_0,beta_0];
+        obj.x = [ro_0; beta_0; x_0; y_0; theta_0];
 
         sigma_d = sigma_phi/(2*K);
-        obj.P = [sigma_d^2, 0; 0, (pi/3)^2];
+        obj.P = [sigma_d^2, 0       , 0                    , 0                    , 0                    ;...
+                    0     , (pi/3)^2, 0                    , 0                    , 0                    ;...
+                    0     , 0       , robot_cov_matrix(1,1), robot_cov_matrix(1,2), robot_cov_matrix(1,3);...
+                    0     , 0       , robot_cov_matrix(2,1), robot_cov_matrix(2,2), robot_cov_matrix(2,3);...
+                    0     , 0       , robot_cov_matrix(3,1), robot_cov_matrix(3,2), robot_cov_matrix(3,3)];
 
         obj.weight = weight_init;
         obj.weight_history = [obj.weight_history; obj.weight];
 
     end
-    
-    % function that computes the prediction step of the filter
+ 
+    % function that computes the predicti9on step of the filter
     function EKF_predict(obj, encoder_readings, d) % constructor
         % initialize cell array encoder readings
 
@@ -72,66 +69,78 @@ methods
 
         ro_curr = obj.x(1);
         beta_curr = obj.x(2);
+        x_curr = obj.x(3);
+        y_curr = obj.x(4);
+        theta_curr = obj.x(5);
         P_curr = obj.P;
 
         ro_next = ro_curr - u*cos(beta_curr);
         beta_next = beta_curr + omega + (u/ro_curr)*sin(beta_curr);
+        x_next = x_curr + u*cos(theta_curr);
+        y_next = y_curr + u*sin(theta_curr);
+        theta_next = theta_curr + omega;
+
 
 
         % F, W are respectively Jacobian matrices of the state dynamics with respect to the state and the encoder noise
-        F = [                            1,                 u*sin(beta_curr);...
-             -(u/ro_curr^2)*sin(beta_curr),   1 + (u/ro_curr)*cos(beta_curr)];
+        F = [1                            , u*sin(beta_curr)              , 0 , 0 , 0                 ;...
+             -(u/ro_curr^2)*sin(beta_curr), 1 + (u/ro_curr)*cos(beta_curr), 0 , 0 , 0                 ;...
+             0                            , 0                             , 1 , 0 , -u*sin(theta_curr);...
+             0                            , 0                             , 0 , 1 , u*cos(theta_curr) ;...
+             0                            , 0                             , 0 , 0 , 1];
 
-        W = [                  -0.5*cos(beta_curr),                     -0.5*cos(beta_curr);...
-              1/d + (1/(2*ro_curr))*sin(beta_curr),    -1/d + (1/(2*ro_curr))*sin(beta_curr)];
+        W = [ -0.5*cos(beta_curr)                 , -0.5*cos(beta_curr)                  ;...
+              1/d + (1/(2*ro_curr))*sin(beta_curr), -1/d + (1/(2*ro_curr))*sin(beta_curr);...
+              0.5*cos(theta_curr)                 , 0.5*cos(theta_curr)                  ;...
+              0.5*sin(theta_curr)                 , 0.5*sin(theta_curr)                  ;...
+              1/d                                 , -1/d];
         
         P_next = F*P_curr*F' + W*Q*W';
         
         
-        obj.x = [ro_next,beta_next];
+        obj.x = [ro_next; beta_next; x_next; y_next; theta_next];
         obj.P = P_next;
 
     end
 
     % function that computes the correction step of the filter
-    function EKF_correct(obj, K, sigma_phi, phases, phi_meas_actual) % constructor
+    function EKF_correct(obj, K, sigma_phi, phi_meas) % constructor
         
         ro_curr = obj.x(1);
         beta_curr = obj.x(2);
+        x_curr = obj.x(3);
+        y_curr = obj.x(4);
+        theta_curr = obj.x(5);
+
         P_curr = obj.P;
 
-        x_curr = [ro_curr; beta_curr];
-
         R = sigma_phi^2;
-        H = [-2*K, 0];
-        
-        a = 0;
-        for i = 1:length(phases)
-            a = a + H'*inv(R)*phases(i);
-        end
 
-        F = 0;
-        for i = 1:length(phases)
-            F = F + H'*inv(R)*H;
-        end
-
-        P_next = inv(P_curr + F);
-        x_next = P_next*(P_curr*x_curr + a);
+        H = [-2*K, 0, 0, 0, 0];
         
+        Kalman_gain = P_curr*H'*pinv(H*P_curr*H' + R);
 
         phi_expected = mod(-2*K*ro_curr,2*pi);
 
-        innovation = phi_meas_actual - phi_expected;
-        innovation = atan2(sin(innovation),cos(innovation));           
-        
-        ro_next = x_next(1);
-        beta_next = x_next(2);
+        innovation = phi_meas - phi_expected;
+        innovation = atan2(sin(innovation),cos(innovation));
+        obj.innovation_history = [obj.innovation_history; innovation];
+
+        state_next = [ro_curr; beta_curr; x_curr; y_curr; theta_curr] + Kalman_gain*(innovation);
+
+        P_next = (eye(5) - Kalman_gain*H)*P_curr;
+
+        ro_next = state_next(1);
+        beta_next = state_next(2);
+        x_next = state_next(3);
+        y_next = state_next(4);
+        theta_next = state_next(5);
 
         % update the weight of the EKF instance
         obj.weight = obj.weight*exp(-0.5*innovation^2/(H*P_next*H' + R));
         obj.weight_history = [obj.weight_history; obj.weight];
 
-        obj.x = [ro_next,beta_next];
+        obj.x = [ro_next; beta_next; x_next; y_next; theta_next];
         obj.P = P_next;
     end
 
