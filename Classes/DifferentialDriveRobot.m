@@ -36,6 +36,7 @@ classdef DifferentialDriveRobot < handle
 
         covariance_matrix;
 
+        J_h; % Jacobian of the measurement function with respect to the state
 
     end % properties
 
@@ -83,6 +84,8 @@ classdef DifferentialDriveRobot < handle
             obj.odometry_estimation = {[0,0], diag([0,0])};
 
             obj.covariance_matrix = zeros(3,3);
+
+            obj.J_h = zeros(2,5);
 
         end
 

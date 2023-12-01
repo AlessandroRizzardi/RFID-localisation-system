@@ -35,6 +35,8 @@ for i=1:nRobots
 end
 
 steps = Tf/dt;
+% time vector
+t = 0:dt:Tf;
 
 % 1st virtual target points
 targets = [];
@@ -86,6 +88,9 @@ for k = 1:steps
 
         robots(i).covariance_update();
         
+        % Consensus alghoritm %TODO: think about the condition to start the consensus
+        consensus_alghoritm
+
     end
 
     if mod(k,500) == 0    

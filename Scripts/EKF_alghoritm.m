@@ -49,6 +49,10 @@ beta_est = MHEKFs(i, instance_selected).x(2);
 robots(i).best_tag_estimation(1) = robots(i).x_est(1) + rho_est*cos(robots(i).x_est(3) - beta_est);
 robots(i).best_tag_estimation(2) = robots(i).x_est(2) + rho_est*sin(robots(i).x_est(3) - beta_est);
 
+% jacobian of the position of the tag wrt the state (rho,beta,x,y,theta)
+robots(i).J_h = [cos(robots(i).x_est(3) - beta_est), -rho_est*sin(robots(i).x_est(3) - beta_est), 1, 0, -rho_est*sin(robots(i).x_est(3) - beta_est);...
+                sin(robots(i).x_est(3) - beta_est),  rho_est*cos(robots(i).x_est(3) - beta_est), 0, 1,  rho_est*cos(robots(i).x_est(3) - beta_est)];
+
 robots(i).tag_estimation_history = [robots(i).tag_estimation_history; robots(i).best_tag_estimation(1), robots(i).best_tag_estimation(2)];
 
 if robots(i).distanceFromPoint(targets(i,:)) <= 0.3

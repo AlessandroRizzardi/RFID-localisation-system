@@ -5,7 +5,6 @@ Tf = 40; % Total time [s]
 %Ts = 1; % Sampling time [s]
 dt = 10^-2; % integration-scheme timestep
 
-
 f = 867*10^6; % [Hz] frequency of the reader
 c =   3*10^8; % [m/s] speed of light
 lambda = c/f; % [m] wavelength
