@@ -67,12 +67,12 @@ classdef DifferentialDriveRobot < handle
 
             obj.dt = dt; % integration-scheme time step
 
-            obj.instance_selected = 0;
+            obj.instance_selected = nM;
             obj.steps_in_range = 0;
 
             obj.weights_vec = (1/nM) *ones(nM,1);
 
-            obj.best_tag_estimation = [NaN,NaN];
+            obj.best_tag_estimation = [NaN;NaN];
 
             obj.dynamics_history = {};
             obj.odometry_history = {};

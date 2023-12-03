@@ -57,9 +57,7 @@ end
 % Final estimation
 for i = 1:nRobots
     if robots(i).init_flag == true && robots(i).steps_in_range > 5
-        x_est_distr = inv(F{i})*a{i}; %REVIEW: is this correct? NOPE
-        % fare i conti per calcolare best tag estimation
-        
+        robots(i).best_tag_estimation = inv(F{i})*a{i};
         robots(i).tag_estimation_history = [robots(i).tag_estimation_history; robots(i).best_tag_estimation];
 
     end

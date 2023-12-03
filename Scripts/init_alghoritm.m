@@ -16,13 +16,13 @@ end
 
 rho_est = MHEKFs(i,nM).x(1);
 beta_est = MHEKFs(i,nM).x(2);
+robots(i).instance_selected = nM;
 
 %best_state_estimate = [rho_est,beta_est];
 
-robots(i).best_tag_estimation(2) = robots(i).x_est(2) + rho_est*sin(robots(i).x_est(3) - beta_est);
-robots(i).best_tag_estimation(1) = robots(i).x_est(1) + rho_est*cos(robots(i).x_est(3) - beta_est);
 
-robots(i).tag_estimation_history = [robots(i).tag_estimation_history; robots(i).best_tag_estimation(1), robots(i).best_tag_estimation(2)];
+robots(i).best_tag_estimation(1,1) = robots(i).x_est(1) + rho_est*cos(robots(i).x_est(3) - beta_est);
+robots(i).best_tag_estimation(2,1) = robots(i).x_est(2) + rho_est*sin(robots(i).x_est(3) - beta_est);
 
 
 targets(i,:) = generateRandomPointInCircle(robots(i).best_tag_estimation, max_range);

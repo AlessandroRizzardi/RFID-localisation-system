@@ -96,7 +96,7 @@ for k = 1:steps
     
     
     % Consensus algorithm has to run only if there is at least one value true in the tag_flag_vector
-    if sum(tag_flag_vector) > 0
+    if sum(tag_flag_vector) > 0 &&
         consensus_algorithm
     end
 
