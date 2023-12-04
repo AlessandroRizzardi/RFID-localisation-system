@@ -10,8 +10,10 @@ for i = 1:nRobots
         zi = robots(i).best_tag_estimation;
         Hi = robots(i).J_h;
         j = robots(i).instance_selected;
+
         F{i} = Hi'*inv(Hi*MHEKFs(i,j).P*Hi')*Hi;
         a{i} = Hi'*inv(Hi*MHEKFs(i,j).P*Hi')*zi;
+
     else
         zi = 0;
         Hi = 0;
@@ -56,10 +58,18 @@ end
 
 % Final estimation
 for i = 1:nRobots
-    if robots(i).init_flag == true && robots(i).steps_in_range > 5
-        x_est_distr = inv(F{i})*a{i}; %REVIEW: is this correct? NOPE
-        % fare i conti per calcolare best tag estimation
-        
+    if robots(i).init_flag == true && robots(i).steps_in_range > 5 && rank(F{i}) == 5
+        state_est_distr = inv(F{i})*a{i}; % F is not invertible !! 
+
+        rho_dist = state_est_distr(1);
+        beta_dist = state_est_distr(2);
+        x_dist = state_est_distr(3);
+        y_dist = state_est_distr(4);
+        theta_dist = state_est_distr(5);
+
+        robots(i).best_tag_estimation(1,1) = x_dist + rho_dist*cos(theta_dist - beta_dist);
+        robots(i).best_tag_estimation(2,1) = y_dist + rho_dist*sin(theta_dist - beta_dist);
+
         robots(i).tag_estimation_history = [robots(i).tag_estimation_history; robots(i).best_tag_estimation];
 
     end
