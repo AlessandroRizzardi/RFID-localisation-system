@@ -46,7 +46,6 @@ for i=1:nRobots
     targets = [targets; target];
 end
 
-
 fprintf('--------- Steps da fare: %d ---------\n\n',steps);
 
 for k = 1:steps
@@ -98,6 +97,8 @@ for k = 1:steps
     % Consensus algorithm has to run only if there is at least one value true in the tag_flag_vector
     if sum(tag_flag_vector) > 0
         consensus_algorithm
+    else
+        tag_distribuited_estimation_history{k} = [NaN,Nan];
     end
 
     if mod(k,500) == 0    
