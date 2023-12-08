@@ -41,41 +41,35 @@ if DRAW == true
     
     figure(1)
     hold on
-    angle = 0:0.1:2*pi;
-        rad = max_range;%[m]
-        x_coord = tag_position(1) + rad*cos(angle);
-        y_coord = tag_position(2) + rad*sin(angle);
     for ROBOT=1:nRobots
         plot(robots(ROBOT).best_tag_estimation(1), robots(ROBOT).best_tag_estimation(2), 'b*','MarkerSize',10)
     end
-    plot(x_dynamics,y_dynamics, color_drawing(ROBOT))
-        plot(tag_position(1),tag_position(2),'r*','MarkerSize',10)
-        plot(x_coord,y_coord);
-        plot(x_coord_map, y_coord_map);
-        xlabel('x [m]')
-        ylabel('y [m]')
+    plot(tag_position(1),tag_position(2),'r*','MarkerSize',10)
+    plot(x_coord,y_coord);
+    xlabel('x [m]')
+    ylabel('y [m]')
 
 end
 
 % Plot the error
-figure
-hold on
-for i=1:nRobots
-    plot(t, robots(i).tag_estimation_history{1,:} - tag_position(1), 'LineWidth', 2)
-    leg{end+1} = ['Robot ', num2str(i)];
-end
-title('Error in x')
-xlabel('Time [s]')
-ylabel('Error [m]')
-legend(leg)
-
-figure
-hold on
-for i=1:nRobots
-    plot(t, robots(i).tag_estimation_history{2,:} - tag_position(2), 'LineWidth', 2)
-    leg{end+1} = ['Robot ', num2str(i)];
-end
-title('Error in y')
-xlabel('Time [s]')
-ylabel('Error [m]')
-legend(leg)
+%figure
+%hold on
+%for i=1:nRobots
+%    plot(t, robots(i).tag_estimation_history{1,:} - tag_position(1), 'LineWidth', 2)
+%    leg{end+1} = ['Robot ', num2str(i)];
+%end
+%title('Error in x')
+%xlabel('Time [s]')
+%ylabel('Error [m]')
+%legend(leg)
+%
+%figure
+%hold on
+%for i=1:nRobots
+%    plot(t, robots(i).tag_estimation_history{2,:} - tag_position(2), 'LineWidth', 2)
+%    leg{end+1} = ['Robot ', num2str(i)];
+%end
+%title('Error in y')
+%xlabel('Time [s]')
+%ylabel('Error [m]')
+%legend(leg)

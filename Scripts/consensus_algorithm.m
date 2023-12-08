@@ -59,9 +59,11 @@ end
 
 % Final estimation
 for r = 1:nRobots
-    if robots(r).init_flag == true && robots(r).steps_in_range > 5 && rank(F{r}) == 5
+    if robots(r).init_flag == true
         tag_distribuited_estimation = inv(F{r})*a{r}; 
         tag_distribuited_estimation_history{k} = tag_distribuited_estimation;
+    else
+        tag_distribuited_estimation_history{k} = [NaN,NaN];
     end
 end
 
