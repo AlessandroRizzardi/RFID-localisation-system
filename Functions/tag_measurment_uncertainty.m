@@ -1,30 +1,12 @@
-function[sigma_x, sigma_y] = tag_measurment_uncertainty(state, P)
+function[R] = tag_measurment_uncertainty(P, robot)
 
-    x = state(1);
-    y = state(2);
-    theta = state(3);
-    rho = state(4);
-    beta = state(5);
+    rho_est = robot.best_tag_estimation(1);
+    beta_est = robot.best_tag_estimation(2);
 
+    % jacobian of the position of the tag wrt the state (rho,beta,x,y,theta)
+    robot.J_h = [cos(robot.x_est(3) - beta_est), rho_est*sin(robot.x_est(3) - beta_est), 1, 0, -rho_est*sin(robot.x_est(3) - beta_est);...
+                     sin(robot.x_est(3) - beta_est), -rho_est*cos(robot.x_est(3) - beta_est), 0, 1,  rho_est*cos(robot.x_est(3) - beta_est)];
 
-    dh1_dx = 1;
-    dh1_dy = 0;
-    dh1_dthetha = - rho*sin(theta-beta);
-    dh1_drho = cos(theta-beta);
-    dh1_dbeta = rho*sin(theta-beta);
-
-    dh2_dx = 0;
-    dh2_dy = 1;
-    dh2_dthetha = rho*cos(theta-beta);
-    dh2_drho = sin(theta-beta);
-    dh2_dbeta = -rho*cos(theta-beta);
-
-    dh1_ds = [dh1_dx,dh1_dy,dh1_dthetha,dh1_drho,dh1_dbeta];
-    dh2_ds = [dh2_dx,dh2_dy,dh2_dthetha,dh2_drho,dh2_dbeta];
-
-    sigma_x = 0;
-    sigma_y = 0;
-
-    % TODO: implmenting efficient algorithm to compute propagation of uncertainty
+    R = robot.J_H*P*robot.J_H';
     
 end
