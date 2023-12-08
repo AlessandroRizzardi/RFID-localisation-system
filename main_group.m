@@ -109,7 +109,7 @@ end
 fprintf('           END SIMULATION\n')
 %%
 
-ANIMATION = true;
+ANIMATION = false;
 DRAW = true;
 
 final_plot

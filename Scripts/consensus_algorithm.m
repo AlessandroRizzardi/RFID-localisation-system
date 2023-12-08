@@ -5,37 +5,37 @@ m = 50;
 F = cell(nRobots, 1);
 a = cell(nRobots, 1);
 
-for i = 1:nRobots
-    if robots(i).init_flag == true && robots(i).steps_in_range > 5
-        j = robots(i).instance_selected;
-        zi = robots(i).best_tag_estimation;
+for r = 1:nRobots
+    if robots(r).init_flag == true && robots(r).steps_in_range > 5
+        j = robots(r).instance_selected;
+        zi = robots(r).best_tag_estimation;
         Hi = eye(2);
-        R_i = tag_measurment_uncertainty(MHEKFs(i,j).P, robots(i));
+        R_i = tag_measurment_uncertainty(MHEKFs(r,j).P, robots(r));
 
-        F{i} = Hi'*inv(R_i)*Hi;
-        a{i} = Hi'*inv(R_i)*zi;
+        F{r} = Hi'*inv(R_i)*Hi;
+        a{r} = Hi'*inv(R_i)*zi;
 
     else
         zi = 0;
         Hi = 0;
-        F{i} = 0;
-        a{i} = 0;
+        F{r} = 0;
+        a{r} = 0;
     end
 end
 
-for k = 1:m
+for q = 1:m
 
     % Topology matrix: 1 if there is a link between the nodes when the robots are inside the communication range (tag_vector is true), 0 otherwise
-    for i = 1:nRobots
-        for j = 1:nRobots
-            if i ~= j
-                if tag_flag_vector(i) == true && tag_flag_vector(j) == true
-                    A(i, j) = 1;
+    for r = 1:nRobots
+        for t = 1:nRobots
+            if r ~= t
+                if tag_flag_vector(r) == true && tag_flag_vector(t) == true
+                    A(r, t) = 1;
                 else
-                    A(i, j) = 0;
+                    A(r, t) = 0;
                 end
             else
-                A(i, j) = 0;
+                A(r, t) = 0;
             end
         end
     end
@@ -46,11 +46,11 @@ for k = 1:m
     % Maximum Degree Weighting
     FStore = F;
     aStore = a;
-    for i = 1:nRobots
-        for j = 1:nRobots
-            if A(i, j) == 1
-                F{i} = F{i} + 1/(1+max(D)).*(FStore{j} - FStore{i});
-                a{i} = a{i} + 1/(1+max(D)).*(aStore{j} - aStore{i});
+    for r = 1:nRobots
+        for t = 1:nRobots
+            if A(r, t) == 1
+                F{r} = F{r} + 1/(1+max(D)).*(FStore{t} - FStore{r});
+                a{r} = a{r} + 1/(1+max(D)).*(aStore{t} - aStore{r});
             end
         end
     end
@@ -58,9 +58,9 @@ for k = 1:m
 end
 
 % Final estimation
-for i = 1:nRobots
-    if robots(i).init_flag == true && robots(i).steps_in_range > 5 && rank(F{i}) == 5
-        tag_distribuited_estimation = inv(F{i})*a{i}; 
+for r = 1:nRobots
+    if robots(r).init_flag == true && robots(r).steps_in_range > 5 && rank(F{r}) == 5
+        tag_distribuited_estimation = inv(F{r})*a{r}; 
         tag_distribuited_estimation_history{k} = tag_distribuited_estimation;
     end
 end
