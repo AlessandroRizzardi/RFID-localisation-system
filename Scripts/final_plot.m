@@ -80,7 +80,7 @@ end
 figure
 hold on
 for i=1:nRobots
-    plot(t, robots(i).tag_estimation_history(1,:) - tag_position(1), 'LineWidth', 2)
+    plot(t, robots(i).tag_estimation_history{1,:} - tag_position(1), 'LineWidth', 2)
     leg{end+1} = ['Robot ', num2str(i)];
 end
 title('Error in x')
@@ -91,7 +91,7 @@ legend(leg)
 figure
 hold on
 for i=1:nRobots
-    plot(t, robots(i).tag_estimation_history(2,:) - tag_position(2), 'LineWidth', 2)
+    plot(t, robots(i).tag_estimation_history{2,:} - tag_position(2), 'LineWidth', 2)
     leg{end+1} = ['Robot ', num2str(i)];
 end
 title('Error in y')

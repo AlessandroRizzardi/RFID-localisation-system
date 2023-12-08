@@ -98,7 +98,7 @@ for k = 1:steps
     if sum(tag_flag_vector) > 0
         consensus_algorithm
     else
-        tag_distribuited_estimation_history{k} = [NaN,Nan];
+        tag_distribuited_estimation_history{k} = [NaN,NaN];
     end
 
     if mod(k,500) == 0    
@@ -109,7 +109,7 @@ end
 fprintf('           END SIMULATION\n')
 %%
 
-ANIMATION = false;
+ANIMATION = true;
 DRAW = true;
 
 final_plot

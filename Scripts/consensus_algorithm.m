@@ -10,7 +10,7 @@ for i = 1:nRobots
         j = robots(i).instance_selected;
         zi = robots(i).best_tag_estimation;
         Hi = eye(2);
-        R_i = tag_measurment_uncertainty(MHEKFs(i,j).P, robots(i),);
+        R_i = tag_measurment_uncertainty(MHEKFs(i,j).P, robots(i));
 
         F{i} = Hi'*inv(R_i)*Hi;
         a{i} = Hi'*inv(R_i)*zi;
