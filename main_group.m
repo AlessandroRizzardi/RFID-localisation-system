@@ -13,7 +13,7 @@ config
 %%%%%%%%%%  SETTINGS    %%%%%%%%%%%%%
 % Define position of the tag
 tag_position = [3;3];
-nRobots = 10;
+nRobots = 5;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
 tag_found_flag = false;

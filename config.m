@@ -13,7 +13,7 @@ K = 2*pi/lambda;
 
 Ns = 50; % number of precedent steps used in MHEKF
 
-max_range = 2; % [m] maximum range of the reader
+max_range = 4; % [m] maximum range of the reader
 nM = ceil(max_range/(lambda/2)); % number of measurements
 %nM = 10;
 
