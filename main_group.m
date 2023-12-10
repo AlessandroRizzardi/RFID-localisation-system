@@ -13,7 +13,7 @@ config
 %%%%%%%%%%  SETTINGS    %%%%%%%%%%%%%
 % Define position of the tag
 tag_position = [3;3];
-nRobots = 5;
+nRobots = 7;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
 tag_found_flag = false;
@@ -23,10 +23,12 @@ tag_flag_vector = zeros(nRobots,1);
 % Initialize the swarm
 robots = [];
 for i=1:nRobots
-    random_initial_position = generateRandomPointInCircle([0,0], (x_range(2) - x_range(1))/2); 
+    random_initial_position = generateRandomPointInCircle([0,0], (x_range(2) - x_range(1))/4); 
     robot = DifferentialDriveRobot([random_initial_position(1); random_initial_position(2); 0],R,d,KR,KL,dt,nM);
     robots = [robots, robot];
 end
+
+
 
 % 3x10 matrix
 for i=1:nRobots
@@ -97,8 +99,6 @@ for k = 1:steps
     % Consensus algorithm has to run only if there is at least one value true in the tag_flag_vector
     if sum(tag_flag_vector) > 0
         consensus_algorithm
-    else
-        tag_distribuited_estimation_history{k} = [NaN,NaN];
     end
 
     if mod(k,500) == 0    

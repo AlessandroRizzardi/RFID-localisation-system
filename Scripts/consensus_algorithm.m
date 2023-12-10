@@ -1,12 +1,12 @@
 %number of consensus protocol messages exchanged by the nodes in the network
-m = 50;
+m = 100;
 
 % Initialisation
 F = cell(nRobots, 1);
 a = cell(nRobots, 1);
 
 for r = 1:nRobots
-    if robots(r).init_flag == true && robots(r).steps_in_range > 5
+    if robots(r).init_flag == true 
         j = robots(r).instance_selected;
         zi = robots(r).best_tag_estimation;
         Hi = eye(2);
@@ -23,47 +23,48 @@ for r = 1:nRobots
     end
 end
 
-for q = 1:m
 
-    % Topology matrix: 1 if there is a link between the nodes when the robots are inside the communication range (tag_vector is true), 0 otherwise
-    for r = 1:nRobots
-        for t = 1:nRobots
-            if r ~= t
-                if tag_flag_vector(r) == true && tag_flag_vector(t) == true
-                    A(r, t) = 1;
-                else
-                    A(r, t) = 0;
-                end
+% Topology matrix: 1 if there is a link between the nodes when the robots are inside the communication range (tag_vector is true), 0 otherwise
+for r = 1:nRobots
+    for t = 1:nRobots
+        if r ~= t
+            if tag_flag_vector(r) == true && tag_flag_vector(t) == true
+                A(r, t) = 1;
             else
                 A(r, t) = 0;
             end
+        else
+            A(r, t) = 0;
         end
     end
+end
 
-    % Degree vector
-    D = A * ones(nRobots, 1);
+% Degree vector
+D = A * ones(nRobots, 1);
 
-    % Maximum Degree Weighting
+for q = 1:m
     FStore = F;
     aStore = a;
+    % Maximum Degree Weighting
     for r = 1:nRobots
         for t = 1:nRobots
             if A(r, t) == 1
-                F{r} = F{r} + 1/(1+max(D)).*(FStore{t} - FStore{r});
-                a{r} = a{r} + 1/(1+max(D)).*(aStore{t} - aStore{r});
+                F{r} = F{r} + 1/(1+max(D))*(FStore{t} - FStore{r});
+                a{r} = a{r} + 1/(1+max(D))*(aStore{t} - aStore{r});
             end
         end
     end
 
 end
 
-% Final estimation
+%Final estimation
 for r = 1:nRobots
-    if robots(r).init_flag == true
-        tag_distribuited_estimation = inv(F{r})*a{r}; 
-        tag_distribuited_estimation_history{k} = tag_distribuited_estimation;
+    if robots(r).init_flag == true 
+        robots(r).best_tag_estimation = inv(F{r})*a{r};
+        robots(r).tag_estimation_history{k} = inv(F{r})*a{r}; 
     else
-        tag_distribuited_estimation_history{k} = [NaN,NaN];
+        robots(r).best_tag_estimation = [NaN;NaN];
+        robots(r).tag_estimation_history{k} = [NaN;NaN];
     end
 end
 

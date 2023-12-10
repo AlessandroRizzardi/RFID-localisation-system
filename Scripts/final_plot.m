@@ -25,8 +25,8 @@ if ANIMATION == true
         leg{2} = 'Tag Range';
 
         for ROBOT=1:nRobots
-            plot(robots(ROBOT).odometry_history{k,1}(1), robots(ROBOT).odometry_history{k,1}(2), 'Color', color_plot(ROBOT, :), 'Marker', markerStyles{3})
-            %plot(robots(i).dynamics_history{k,1}(1), robots(i).dynamics_history{k,1}(2),'bo','MarkerSize', 10, 'LineWidth',2)
+            %plot(robots(ROBOT).odometry_history{k,1}(1), robots(ROBOT).odometry_history{k,1}(2), 'Color', color_plot(ROBOT, :), 'Marker', markerStyles{3})
+            plot(robots(ROBOT).dynamics_history{k,1}(1), robots(ROBOT).dynamics_history{k,1}(2),'Color', color_plot(ROBOT, :), 'Marker', markerStyles{3})
             plot(robots(ROBOT).tag_estimation_history{k}(1), robots(ROBOT).tag_estimation_history{k}(2), 'Color', color_plot(ROBOT, :), 'Marker', markerStyles{2}, 'MarkerSize', 7)
             %legend
             leg{end+1} = ['Robot', num2str(ROBOT)];
@@ -40,8 +40,8 @@ if ANIMATION == true
         ylim([-6, 6])
 
         title(['Step ', num2str(k)])
-        legend(leg)
-        %pause(.001)
+        %legend(leg)
+        pause(.01)
         drawnow
     end
 end
@@ -62,7 +62,7 @@ if DRAW == true
     xlabel('x [m]')
     ylabel('y [m]')
     title('Final Estimate')
-    legend(leg)
+    %legend(leg)
     xlim([-6, 6])
     ylim([-6, 6])
 end
