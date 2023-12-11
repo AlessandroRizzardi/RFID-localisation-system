@@ -27,7 +27,7 @@ if ANIMATION == true
         for ROBOT=1:nRobots
             %plot(robots(ROBOT).odometry_history{k,1}(1), robots(ROBOT).odometry_history{k,1}(2), 'Color', color_plot(ROBOT, :), 'Marker', markerStyles{3})
             plot(robots(ROBOT).dynamics_history{k,1}(1), robots(ROBOT).dynamics_history{k,1}(2),'Color', color_plot(ROBOT, :), 'Marker', markerStyles{3})
-            plot(robots(ROBOT).tag_estimation_history{k}(1), robots(ROBOT).tag_estimation_history{k}(2), 'Color', color_plot(ROBOT, :), 'Marker', markerStyles{2}, 'MarkerSize', 7)
+            plot(robots(ROBOT).tag_estimation_history{k,1}(1), robots(ROBOT).tag_estimation_history{k,1}(2), 'Color', color_plot(ROBOT, :), 'Marker', markerStyles{2}, 'MarkerSize', 7)
             %legend
             leg{end+1} = ['Robot', num2str(ROBOT)];
             leg{end+1} = ['TagEstimation ', num2str(ROBOT)];
@@ -55,37 +55,56 @@ if DRAW == true
     leg{1} = 'Tag';
     leg{2} = 'Tag Range';
     for ROBOT=1:nRobots
+        % matrix_position = cell2mat(robots(ROBOT).odometry_history);
+        % plot(matrix_position(:,1), matrix_position(:,2), 'Color', color_plot(ROBOT, :))
         plot(robots(ROBOT).best_tag_estimation(1), robots(ROBOT).best_tag_estimation(2), 'Color', color_plot(ROBOT, :), 'Marker', markerStyles{2}, 'MarkerSize', 7)
+        % leg{end+1} = ['Robot', num2str(ROBOT)];
         leg{end+1} = ['TagEstimation ', num2str(ROBOT)];
     end
-    
+    xlim([-6, 6])
+    ylim([-6, 6])
     xlabel('x [m]')
     ylabel('y [m]')
     title('Final Estimate')
-    %legend(leg)
-    xlim([-6, 6])
-    ylim([-6, 6])
+    legend(leg)
 end
 
 % Plot the error
-%figure
-%hold on
-%for i=1:nRobots
-%    plot(t, robots(i).tag_estimation_history{1,:} - tag_position(1), 'LineWidth', 2)
+% error = [];
+% figure
+% hold on
+% for i=1:nRobots
+%     for k = 1:steps
+%         if isnan(robots(i).tag_estimation_history{k})
+%             error(k) = NaN;
+%         else
+%             error(k) = robots(i).tag_estimation_history{k}(1) - tag_position(1);
+%         end
+%     end
+%    plot(t, error, 'LineWidth', 2)
 %    leg{end+1} = ['Robot ', num2str(i)];
-%end
-%title('Error in x')
-%xlabel('Time [s]')
-%ylabel('Error [m]')
-%legend(leg)
-%
-%figure
-%hold on
-%for i=1:nRobots
-%    plot(t, robots(i).tag_estimation_history{2,:} - tag_position(2), 'LineWidth', 2)
+% end
+% title('Error in x')
+% xlabel('Time [s]')
+% ylabel('Error [m]')
+% legend(leg)
+% 
+% error = [];
+% figure
+% hold on
+% for i=1:nRobots
+%    for k = 1:steps
+%         if isnan(robots(i).tag_estimation_history{k})
+%             error(k) = NaN;
+%         else
+%             error(k) = robots(i).tag_estimation_history{k}(2) - tag_position(2);
+% 
+%         end
+%    end
+%    plot(t, error, 'LineWidth', 2)
 %    leg{end+1} = ['Robot ', num2str(i)];
-%end
-%title('Error in y')
-%xlabel('Time [s]')
-%ylabel('Error [m]')
-%legend(leg)
+% end
+% title('Error in y')
+% xlabel('Time [s]')
+% ylabel('Error [m]')
+% legend(leg)

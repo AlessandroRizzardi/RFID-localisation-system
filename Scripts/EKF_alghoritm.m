@@ -48,10 +48,10 @@ beta_est = MHEKFs(i, instance_selected).x(2);
 robots(i).best_tag_estimation(1,1) = robots(i).x_est(1) + rho_est*cos(robots(i).x_est(3) - beta_est);
 robots(i).best_tag_estimation(2,1) = robots(i).x_est(2) + rho_est*sin(robots(i).x_est(3) - beta_est);
 
-robots(i).tag_estimation_history{k} = robots(i).best_tag_estimation;
+robots(i).tag_estimation_history{k,1} = robots(i).best_tag_estimation;
 
 if robots(i).distanceFromPoint(targets(i,:)) <= 0.3
-    targets(i,:) = generateRandomPointInCircle(robots(i).best_tag_estimation, 0.5 *max_range);
+    targets(i,:) = generateRandomPointInCircle(robots(i).best_tag_estimation, 0.5*max_range);
 end
 
 target_point = targets(i,:);

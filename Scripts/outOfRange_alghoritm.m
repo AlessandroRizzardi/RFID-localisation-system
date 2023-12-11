@@ -19,7 +19,7 @@ elseif tag_found_flag == true
 
 end
     
-robots(i).tag_estimation_history{k} = [NaN;NaN];
+robots(i).tag_estimation_history{k,1} = [NaN;NaN];
 
 robots(i).init_flag = false;
 
