@@ -1,55 +1,3 @@
-close all;
-clear;  
-clc;
-
-addpath('Functions')
-addpath('Classes')
-addpath('Scripts')
-
-
-% Load the configuration parameters for the algorithms
-config
-
-%%%%%%%%%%  SETTINGS    %%%%%%%%%%%%%
-% Define position of the tag
-tag_position = generateRandomPointInCircle([0,0], radius_map - max_range);
-nRobots = 2;
-%%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
-
-tag_found_flag = false;
-tag_found_position = [0,0];
-tag_flag_vector = zeros(nRobots,1);
-
-% Initialize the swarm
-robots = [];
-for i=1:nRobots
-    random_initial_position = generateRandomPointInCircle([0,0], radius_map); 
-    robot = DifferentialDriveRobot([random_initial_position(1); random_initial_position(2); 0],R,d,KR,KL,dt,nM);
-    robots = [robots, robot];
-end
-
-
-
-% 3x10 matrix
-for i=1:nRobots
-    for l=1:nM
-        MHEKFs(i,l) = EKF();
-    end
-end
-
-steps = Tf/dt;
-% time vector
-t = 0:dt:Tf;
-
-% 1st virtual target points
-targets = [];
-for i=1:nRobots
-    target = generateRandomPointInCircle([3,3],2); % actually set to go towards the target, change for real simulation
-    targets = [targets; target];
-end
-
-fprintf('--------- Steps da fare: %d ---------\n\n',steps);
-
 for k = 1:steps
 
     phases = [];
@@ -68,7 +16,7 @@ for k = 1:steps
         
         if robots(i).init_flag == false && robots(i).inTagRange(tag_position,max_range) == true
             
-            fprintf('Tag found by robot %d \n', i);
+            %fprintf('Tag found by robot %d \n', i);
            
             init_alghoritm
         
@@ -96,8 +44,10 @@ for k = 1:steps
     end
     
     % Consensus algorithm has to run only if there is at least one value true in the tag_flag_vector
-    if sum(tag_flag_vector) > 0
-        consensus_algorithm
+    if CONSENSUS == true
+        if sum(tag_flag_vector) > 0
+            consensus_algorithm
+        end
     end
 
     % check which robot has more steps in range
@@ -112,13 +62,3 @@ for k = 1:steps
         fprintf('--------- Step numero: %d ---------\n',k);
     end
 end
-
-fprintf('           END SIMULATION\n')
-%%
-
-ANIMATION = true;
-DRAW = false;
-
-final_plot
-
-fprintf('           END ANIMATION\n')

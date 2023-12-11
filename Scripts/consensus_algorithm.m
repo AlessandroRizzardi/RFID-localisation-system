@@ -1,5 +1,3 @@
-%number of consensus protocol messages exchanged by the nodes in the network
-m = 50;
 
 % Initialisation
 F = cell(nRobots, 1);
@@ -27,7 +25,7 @@ for r = 1:nRobots
 end
 
 
-for q = 1:m
+for q = 1:msg
     A = zeros(nRobots,nRobots);
 
     % metodo prof
