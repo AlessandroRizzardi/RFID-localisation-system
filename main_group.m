@@ -13,7 +13,7 @@ config
 %%%%%%%%%%  SETTINGS    %%%%%%%%%%%%%
 % Define position of the tag
 tag_position = generateRandomPointInCircle([0,0], radius_map - max_range);
-nRobots = 2;
+nRobots = 6;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
 tag_found_flag = false;
@@ -120,5 +120,11 @@ ANIMATION = false;
 DRAW = true;
 
 final_plot
+
+ERROR_x = abs(robots(1).best_tag_estimation(1) - tag_position(1));
+ERROR_y = abs(robots(1).best_tag_estimation(2) - tag_position(2));
+
+fprintf('Estimation error along x: %d cm\n',round(ERROR_x,3)*100);
+fprintf('Estimation error along y: %d cm\n',round(ERROR_y,3)*100);
 
 fprintf('           END ANIMATION\n')

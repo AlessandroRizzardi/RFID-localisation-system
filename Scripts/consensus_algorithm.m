@@ -1,5 +1,5 @@
 %number of consensus protocol messages exchanged by the nodes in the network
-m = 100;
+m = 50;
 
 % Initialisation
 F = cell(nRobots, 1);

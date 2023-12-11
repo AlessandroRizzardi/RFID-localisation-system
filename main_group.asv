@@ -13,7 +13,7 @@ config
 %%%%%%%%%%  SETTINGS    %%%%%%%%%%%%%
 % Define position of the tag
 tag_position = generateRandomPointInCircle([0,0], radius_map - max_range);
-nRobots = 3;
+nRobots = 2;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
 tag_found_flag = false;
@@ -102,11 +102,10 @@ for k = 1:steps
 
     % check which robot has more steps in range
     [max_steps, index] = max([robots.steps_in_range]);
-    % communicate to the robots outside the range the new position to go to, 
+    % communicate to the robots the new update position to go to, 
     % that is the best estimation of the robot with the most steps in range
-    if max_steps == 100
+    if max_steps == 250
         tag_found_position = [robots(index).best_tag_estimation(1,1), robots(index).best_tag_estimation(2,1)];
-        for 
     end
 
     if mod(k,500) == 0    
@@ -117,8 +116,8 @@ end
 fprintf('           END SIMULATION\n')
 %%
 
-ANIMATION = false;
-DRAW = true;
+ANIMATION = true;
+DRAW = false;
 
 final_plot
 
