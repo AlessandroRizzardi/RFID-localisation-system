@@ -29,7 +29,7 @@ Kp_w1= 2;
 
 x_range = [-5 5]; % [m] range of the map
 y_range = [-5 5]; % [m] range of the map
-radius_map = (x_range(2) - x_range(1))*sqrt(2)/2; % [m] radius of the map
+radius_map = (x_range(2) - x_range(1))/2; % [m] radius of the map
 
 % method_paper = false;
 

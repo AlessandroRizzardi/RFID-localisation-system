@@ -12,15 +12,15 @@ config
 
 %%%%%%%%%%  SETTINGS    %%%%%%%%%%%%%
 % Define position of the tag
-tag_position = generateRandomPointInCircle([0,0], radius_map - max_range);
-nRobots = 4;
+tag_position = [0,0];
+nRobots = 1;
 KL = 0.01*10^-2; % noise parameters of odometry
 KR = 0.01*10^-2;
 sigma_phi = 0.2; % [rad] standard deviation of the angle measurement
 msg = 50;        %number of consensus protocol messages exchanged by the nodes in the network
-CONSENSUS = true;
+CONSENSUS = false;
 ANIMATION = false;
-PLOTS = true;
+DRAW = true;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
 initialization
@@ -35,8 +35,8 @@ if ANIMATION == true
 end
 fprintf('           END ANIMATION\n')
 %%
-if PLOTS == true
-    plots
+if DRAW == true
+    final_plot
 end
 
 ERROR_x = abs(robots(1).best_tag_estimation(1) - tag_position(1));

@@ -1,11 +1,10 @@
 tag_found_flag = false;
-tag_found_position = [0,0];
 tag_flag_vector = zeros(nRobots,1);
 
 % Initialize the swarm
 robots = [];
 for i=1:nRobots
-    random_initial_position = generateRandomPointInCircle([0,0], radius_map); 
+    random_initial_position = generateRandomPointOnCircumferences([0,0], radius_map); 
     robot = DifferentialDriveRobot([random_initial_position(1); random_initial_position(2); 0],R,d,KR,KL,dt,nM);
     robots = [robots, robot];
 end
@@ -25,8 +24,8 @@ t = 0:dt:Tf;
 targets = [];
 
 for i=1:nRobots
-    target = generateRandomPointInCircle([3,3],2); % actually set to go towards the target, change for real simulation
+    target = generateRandomPointInCircle([tag_position(1),tag_position(2)],2); % actually set to go towards the target, change for real simulation
     targets = [targets; target];
 end
 
-fprintf('--------- Steps da fare: %d ---------\n\n',steps);
+%fprintf('--------- Steps da fare: %d ---------\n\n',steps);

@@ -7,40 +7,38 @@ y_coord = tag_position(2) + rad*sin(angle);
 % vector of different colors and markers for the plots
 markerStyles = {'d', 'pentagram', 'o', '^', 'v'};
 
-% I need to plot the tag position and the robot position with different colors and markers (possibly more than 10)
+% I need to plot the tag position and the robot position with different colors and markers
 color_plot= lines(nRobots); % Vector of different colors
 
 % Animations
-if ANIMATION == true
-    for k = 1:steps
-        leg = {};
-        figure(1)
-        clf
-        hold on
+for k = 1:steps
+    leg = {};
+    figure(1)
+    clf
+    hold on
 
-        plot(tag_position(1),tag_position(2),'Marker', markerStyles{1},'MarkerSize',10)
-        plot(x_coord,y_coord, '--g');
-        leg{1} = 'Tag';
-        leg{2} = 'Tag Range';
+    plot(tag_position(1),tag_position(2),'Marker', markerStyles{1},'MarkerSize',10)
+    plot(x_coord,y_coord, '--g');
+    leg{1} = 'Tag';
+    leg{2} = 'Tag Range';
 
-        for ROBOT=1:nRobots
-            %plot(robots(ROBOT).odometry_history{k,1}(1), robots(ROBOT).odometry_history{k,1}(2), 'Color', color_plot(ROBOT, :), 'Marker', markerStyles{3})
-            plot(robots(ROBOT).dynamics_history{k,1}(1), robots(ROBOT).dynamics_history{k,1}(2),'Color', color_plot(ROBOT, :), 'Marker', markerStyles{3})
-            plot(robots(ROBOT).tag_estimation_history{k,1}(1), robots(ROBOT).tag_estimation_history{k,1}(2), 'Color', color_plot(ROBOT, :), 'Marker', markerStyles{2}, 'MarkerSize', 7)
-            %legend
-            leg{end+1} = ['Robot', num2str(ROBOT)];
-            leg{end+1} = ['TagEstimation ', num2str(ROBOT)];
-        end    
-    
-        xlabel('x [m]')
-        ylabel('y [m]')
+    for ROBOT=1:nRobots
+        plot(robots(ROBOT).odometry_history{k,1}(1), robots(ROBOT).odometry_history{k,1}(2), 'Color', color_plot(ROBOT, :), 'Marker', markerStyles{3})
+        %plot(robots(ROBOT).dynamics_history{k,1}(1), robots(ROBOT).dynamics_history{k,1}(2),'Color', color_plot(ROBOT, :), 'Marker', markerStyles{3})
+        plot(robots(ROBOT).tag_estimation_history{k,1}(1), robots(ROBOT).tag_estimation_history{k,1}(2), 'Color', color_plot(ROBOT, :), 'Marker', markerStyles{2}, 'MarkerSize', 7)
+        %legend
+        leg{end+1} = ['Robot', num2str(ROBOT)];
+        leg{end+1} = ['TagEstimation ', num2str(ROBOT)];
+    end    
 
-        xlim([-6, 6])
-        ylim([-6, 6])
+    xlabel('x [m]')
+    ylabel('y [m]')
 
-        title(['Step ', num2str(k)])
-        %legend(leg)
-        pause(.01)
-        drawnow
-    end
+    xlim([-6, 6])
+    ylim([-6, 6])
+
+    title(['Step ', num2str(k)])
+    %legend(leg)
+    pause(.01)
+    drawnow
 end

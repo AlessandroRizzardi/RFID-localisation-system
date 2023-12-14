@@ -20,7 +20,7 @@ for k = 1:steps
            
             init_alghoritm
         
-        elseif robots(i).init_flag && robots(i).inTagRange(tag_position, max_range) == true
+        elseif robots(i).init_flag == true && robots(i).inTagRange(tag_position, max_range) == true
 
             EKF_alghoritm
 
@@ -51,14 +51,15 @@ for k = 1:steps
     end
 
     % check which robot has more steps in range
-    [max_steps, index] = max([robots.steps_in_range]);
+    %[max_steps, index] = max([robots.steps_in_range]);
     % communicate to the robots the new update position to go to, 
     % that is the best estimation of the robot with the most steps in range
-    if max_steps == 250
-        tag_found_position = [robots(index).best_tag_estimation(1,1), robots(index).best_tag_estimation(2,1)];
-    end
+    %if max_steps == 70
+    %    tag_found_position = [robots(index).best_tag_estimation(1,1), robots(index).best_tag_estimation(2,1)];
+    %end
 
-    if mod(k,500) == 0    
-        fprintf('--------- Step numero: %d ---------\n',k);
-    end
+
+    %if mod(k,500) == 0    
+    %    fprintf('--------- Step numero: %d ---------\n',k);
+    %end
 end

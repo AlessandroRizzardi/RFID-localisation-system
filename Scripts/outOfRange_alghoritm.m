@@ -2,7 +2,7 @@
 %phase_history(k,1) = 0;
 
 if tag_found_flag == false
-   if robots(i).distanceFromPoint(targets(i,:)) <= 0.3 
+   if robots(i).distanceFromPoint(targets(i,:)) <= 0.8 
     targets(i,:) = generateRandomPointInCircle([0,0],radius_map);
    end
 
@@ -11,6 +11,9 @@ if tag_found_flag == false
 
 elseif tag_found_flag == true
 
+    if robots(i).distanceFromPoint(tag_found_position) <= 0.8
+        tag_found_position = generateRandomPointInCircle([robots(i).best_tag_estimation(1,1), robots(i).best_tag_estimation(2,1)],1);
+    end
 
     targets(i,:) = tag_found_position;
 
