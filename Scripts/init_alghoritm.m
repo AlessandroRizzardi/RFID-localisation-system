@@ -2,6 +2,8 @@
 tag_found_flag = true;
 tag_found_position = [robots(i).x_est(1), robots(i).x_est(2)];
 
+border_rangetag_position = tag_found_position;
+
 robots(i).init_flag = true;
 %phase_measured = robots(i).phaseMeasured(tag_position, lambda , sigma_phi);
 

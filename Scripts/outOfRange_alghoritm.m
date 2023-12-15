@@ -12,7 +12,11 @@ if tag_found_flag == false
 elseif tag_found_flag == true
 
     if robots(i).distanceFromPoint(tag_found_position) <= 0.8
-        tag_found_position = generateRandomPointInCircle([robots(i).best_tag_estimation(1,1), robots(i).best_tag_estimation(2,1)],1);
+        if ~isnan(robots(i).best_tag_estimation(1,1))
+            tag_found_position = generateRandomPointInCircle([robots(i).best_tag_estimation(1,1), robots(i).best_tag_estimation(2,1)],1);
+        else
+            tag_found_position = generateRandomPointInCircle([border_rangetag_position(1), border_rangetag_position(2)],1);
+        end
     end
 
     targets(i,:) = tag_found_position;
