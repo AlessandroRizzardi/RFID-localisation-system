@@ -23,7 +23,7 @@ ANIMATION = false;
 PLOTS = true;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
-nExp = 10; % Simulations to do for every test
+nExp = 100; % Simulations to do for every test
 
 TEST = 4;  % 1: Monte-Carlo simulation with single robot
            % 2: Test with single robot over different odometry noise
@@ -370,7 +370,7 @@ end
 if TEST == 4
     fprintf('!!!! TEST CASE: Performing different simulations with different number of robots !!!!\n')
     
-    swarm_dimension = [4, 10, 50, 100];
+    swarm_dimension = [3, 10];
     
     for exp = 1:length(swarm_dimension)
         nRobots = swarm_dimension(exp);
