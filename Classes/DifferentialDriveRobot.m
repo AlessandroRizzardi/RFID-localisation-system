@@ -18,6 +18,26 @@ classdef DifferentialDriveRobot < handle
         KR;
         dt;
 
+        instance_selected;
+        steps_in_range;
+        weights_vec;
+        
+        best_tag_estimation;
+
+        dynamics_history;
+        odometry_history;
+        tag_estimation_history;
+
+        init_flag;
+
+        odometry_estimation;
+
+        phase_measured;
+
+        covariance_matrix;
+
+        J_h; % Jacobian of the measurement function with respect to the state
+
     end % properties
 
     %  ____        _     _ _        __  __                _                                                             
@@ -30,13 +50,15 @@ classdef DifferentialDriveRobot < handle
     % here we firstly define the functions that are intended to be called in the main program                                                                                                                   
     methods 
 
-        function obj = DifferentialDriveRobot(initial_state, R, d, KR, KL, dt) % constructor
+        function obj = DifferentialDriveRobot(initial_state, R, d, KR, KL, dt, nM) % constructor
             obj.x = zeros(3,1);
             obj.x(1) = initial_state(1);
             obj.x(2) = initial_state(2);
             obj.x(3) = initial_state(3);
 
-            obj.x_est = zeros(3,1);
+            obj.x_est(1) = initial_state(1);
+            obj.x_est(2) = initial_state(2);
+            obj.x_est(3) = initial_state(3);
 
             obj.R = R;
             obj.d = d;
@@ -44,6 +66,26 @@ classdef DifferentialDriveRobot < handle
             obj.KL = KL;
 
             obj.dt = dt; % integration-scheme time step
+
+            obj.instance_selected = nM;
+            obj.steps_in_range = 0;
+
+            obj.weights_vec = (1/nM) *ones(nM,1);
+
+            obj.best_tag_estimation = [NaN;NaN];
+
+            obj.dynamics_history = {};
+            obj.odometry_history = {};
+            obj.tag_estimation_history = {};
+
+
+            obj.init_flag = false;
+
+            obj.odometry_estimation = {[0,0], diag([0,0])};
+
+            obj.covariance_matrix = zeros(3,3);
+
+            obj.J_h = zeros(2,5);
 
         end
 
@@ -82,7 +124,31 @@ classdef DifferentialDriveRobot < handle
             
             Q = [obj.KR * abs(uR) , 0 ; 0, obj.KL*abs(uL)];
 
-            odometry_estimation = {[u_est,omega_est],Q}; 
+            obj.odometry_estimation = {[u_est,omega_est],Q}; 
+            odometry_estimation = obj.odometry_estimation;
+
+    
+        end
+
+        function covariance_update(obj) % constructor
+            % initialize cell array encoder readings
+    
+            u = obj.odometry_estimation{1,1}(1);
+            Q = obj.odometry_estimation{1,2};
+    
+            % A, G are respectively Jacobian matrices of the state dynamics with respect to the state and the encoder noise
+            A = [
+                 1, 0, -u*sin(obj.x(3));...
+                 0, 1,  u*cos(obj.x(3));...
+                 0, 0,  1             ];
+    
+            G = [0.5*cos(obj.x(3)), 0.5*cos(obj.x(3));...
+                 0.5*sin(obj.x(3)), 0.5*sin(obj.x(3));... 
+                 1/obj.d          , -1/obj.d        ];
+            
+            obj.covariance_matrix = A*obj.covariance_matrix*A' + G*Q*G';
+
+    
         end
 
         function inRange = inTagRange(obj,tag_position, max_range)
@@ -95,12 +161,12 @@ classdef DifferentialDriveRobot < handle
             end
         end
 
-        function phase_measured = phaseMeasured(obj, tag_position, lambda , sigma_phi)
+        function phaseMeasured(obj, tag_position, lambda , sigma_phi)
             distance = obj.getTagDistance(tag_position);
         
             phase = (distance * 4 * pi)/lambda;
 
-            phase_measured = mod(-phase + normrnd(0,sigma_phi) , 2*pi) ;
+            obj.phase_measured = mod(-phase + normrnd(0,sigma_phi) , 2*pi) ;
 
         end
 
@@ -127,6 +193,10 @@ classdef DifferentialDriveRobot < handle
             y_tag = tag_position(2);
             distance = sqrt((obj.x(1) - x_tag)^2 + (obj.x(2) - y_tag)^2);
             
+        end
+
+        function distance = distanceFromPoint(obj, point)
+            distance = sqrt((obj.x_est(1) - point(1))^2 + (obj.x_est(2) - point(2))^2);
         end
 
 

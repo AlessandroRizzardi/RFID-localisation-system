@@ -1,31 +1,72 @@
-x_odometry = zeros(length(odometry_history),1);
-y_odometry = zeros(length(odometry_history),1);
-x_dynamics = zeros(length(dynamics_history),1);
-y_dynamics = zeros(length(dynamics_history),1);
-
-for i = 1:length(odometry_history)
-    x_odometry(i) = odometry_history{i,1}(1);
-    y_odometry(i) = odometry_history{i,1}(2);
-
-    x_dynamics(i) = dynamics_history{i,1}(1);
-    y_dynamics(i) = dynamics_history{i,1}(2);
-end
-
 angle = 0:0.1:2*pi;
 rad = max_range; %[m]
 x_coord = tag_position(1) + rad*cos(angle);
 y_coord = tag_position(2) + rad*sin(angle);
 
-% Plottings
+
+% vector of different colors and markers for the plots
+markerStyles = {'d', 'pentagram', 'o', '^', 'v'};
+
+% I need to plot the tag position and the robot position with different colors and markers
+color_plot= lines(nRobots); % Vector of different colors
+
+leg = {};
 figure(1)
 hold on
-plot(x_odometry,y_odometry,'b')
-plot(x_dynamics,y_dynamics,'r')
-plot(tag_position(1),tag_position(2),'r*','MarkerSize',10)
-plot(best_tag_estimation_x, best_tag_estimation_y,'b*','MarkerSize',10)
+plot(tag_position(1),tag_position(2),'Marker', markerStyles{1},'MarkerSize',10)
 plot(x_coord,y_coord);
-legend('Odometry','Dynamics','Tag Position','Best estimation')
+leg{1} = 'Tag';
+leg{2} = 'Tag Range';
+for ROBOT=1:nRobots
+    matrix_position = cell2mat(robots(ROBOT).odometry_history);
+    plot(matrix_position(:,1), matrix_position(:,2), 'Color', color_plot(ROBOT, :))
+    plot(robots(ROBOT).best_tag_estimation(1), robots(ROBOT).best_tag_estimation(2), 'Color', color_plot(ROBOT, :), 'Marker', markerStyles{2}, 'MarkerSize', 7)
+    leg{end+1} = ['Robot', num2str(ROBOT)];
+    leg{end+1} = ['TagEstimation ', num2str(ROBOT)];
+end
+xlim([-6, 6])
+ylim([-6, 6])
 xlabel('x [m]')
 ylabel('y [m]')
-xlim(x_range)
-ylim(y_range)
+title('Final Estimate')
+legend(leg)
+
+% Plot the error
+% error = [];
+% figure
+% hold on
+% for i=1:nRobots
+%     for k = 1:steps
+%         if isnan(robots(i).tag_estimation_history{k})
+%             error(k) = NaN;
+%         else
+%             error(k) = robots(i).tag_estimation_history{k}(1) - tag_position(1);
+%         end
+%     end
+%    plot(t, error, 'LineWidth', 2)
+%    leg{end+1} = ['Robot ', num2str(i)];
+% end
+% title('Error in x')
+% xlabel('Time [s]')
+% ylabel('Error [m]')
+% legend(leg)
+% 
+% error = [];
+% figure
+% hold on
+% for i=1:nRobots
+%    for k = 1:steps
+%         if isnan(robots(i).tag_estimation_history{k})
+%             error(k) = NaN;
+%         else
+%             error(k) = robots(i).tag_estimation_history{k}(2) - tag_position(2);
+% 
+%         end
+%    end
+%    plot(t, error, 'LineWidth', 2)
+%    leg{end+1} = ['Robot ', num2str(i)];
+% end
+% title('Error in y')
+% xlabel('Time [s]')
+% ylabel('Error [m]')
+% legend(leg)

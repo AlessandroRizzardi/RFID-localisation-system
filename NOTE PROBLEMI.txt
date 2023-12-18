@@ -1,2 +1,0 @@
-- Problema è nella correction ma c'è perchè i conti vengono fatti con una matrice P che sta divergendo
-- perchè P è così grande?

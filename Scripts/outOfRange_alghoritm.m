@@ -1,39 +1,34 @@
-for l=1:nM
-    % Save the state history of each EKF instance --> void because the robot is out of rangex\
-    EKF_instances(l).state_history{k,1} = [];
 
-end
+%phase_history(k,1) = 0;
 
-phase_history(k,1) = 0;
+if tag_found_flag == false
+   if robots(i).distanceFromPoint(targets(i,:)) <= 0.8 
+    targets(i,:) = generateRandomPointInCircle([0,0],radius_map);
+   end
 
-if isnan(best_tag_estimation_x)
-    % it means that the robot was already in the range of the tag and need
-    % to try to go back inside --> we use the estimate we already have
+   target_point = targets(i,:);
+   [v,omega] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2), robots(i).x_est);
 
-    x_target = target_point(1);
-    y_target = target_point(2);
-    distance = sqrt((robot.x_est(1) - x_target)^2 + (robot.x_est(2) - y_target)^2);
+elseif tag_found_flag == true
 
-    if distance < 0.5
-        target_point(1) = x_range(1) + (x_range(2)-x_range(1))*rand();
-        target_point(2) = y_range(1) + (y_range(2)-y_range(1))*rand();  
-        points_vector(end+1,:) = [target_point(1),target_point(2)];
-        [v,omega] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2),robot.x_est);
-    else
-        [v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
+    if robots(i).distanceFromPoint(tag_found_position) <= 0.8
+        
+        tag_found_position = generateRandomPointInCircle([border_rangetag_position(1), border_rangetag_position(2)],1);
+        
     end
 
-else
-    % the robot was never in the range, moves randomly
+    targets(i,:) = tag_found_position;
 
-    target_point(1) = best_tag_estimation_x + tag_window(1) + (tag_window(2)-tag_window(1))*rand();
-    target_point(2) = best_tag_estimation_y + tag_window(1) + (tag_window(2)-tag_window(1))*rand();
+    target_point = targets(i,:);
+    [v,omega] = greedy_controller(Kp_v1, Kp_w1, target_point(1),target_point(2), robots(i).x_est);  
 
-    [v,omega] = greedy_controller(Kp_v1,Kp_w1, target_point(1),target_point(2),robot.x_est);
 end
+    
+robots(i).tag_estimation_history{k,1} = [NaN;NaN];
 
-x_next = robot.dynamics(v,omega);
-dynamics_history{k,1} = x_next;
+robots(i).init_flag = false;
 
-odometry_estimation = robot.odometry_step(v,omega);
-odometry_history{k,1} = robot.x_est;
+
+
+%TODO: keep track of steps in range for every robot and if a robot was in the range for more than TOT steps
+%      then the target point is the best tag estimation he has and not the tag_found_position as it is now
