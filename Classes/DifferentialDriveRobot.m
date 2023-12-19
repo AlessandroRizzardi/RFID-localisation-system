@@ -28,6 +28,8 @@ classdef DifferentialDriveRobot < handle
         odometry_history;
         tag_estimation_history;
 
+        last_nonNaN_estimation;
+
         init_flag;
 
         odometry_estimation;
@@ -78,6 +80,7 @@ classdef DifferentialDriveRobot < handle
             obj.odometry_history = {};
             obj.tag_estimation_history = {};
 
+            obj.last_nonNaN_estimation = [NaN;NaN];
 
             obj.init_flag = false;
 
