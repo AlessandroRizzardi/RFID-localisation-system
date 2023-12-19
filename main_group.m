@@ -14,15 +14,15 @@ config
 % Define position of the tag
 tag_position = [0,0];
 % Define the number of robots you want to have
-nRobots = 3;
+nRobots = 4;
 KL = 0.01*10^-2; % noise parameters of odometry
 KR = 0.01*10^-2;
 sigma_phi = 0.2; % [rad] standard deviation of the angle measurement
 msg = 50;        %number of consensus protocol messages exchanged by the nodes in the network
 
-CONSENSUS = true;
-ANIMATION = false;
-DRAW = true;
+CONSENSUS = true; % select true if you have more than 1 robot
+ANIMATION = true;
+DRAW = false;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
 initialization

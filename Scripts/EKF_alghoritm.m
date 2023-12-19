@@ -50,7 +50,7 @@ robots(i).best_tag_estimation(2,1) = robots(i).x_est(2) + rho_est*sin(robots(i).
 
 robots(i).tag_estimation_history{k,1} = robots(i).best_tag_estimation;
 
-if robots(i).distanceFromPoint(targets(i,:)) <= 0.8
+if robots(i).distanceFromPoint(targets(i,:)) <= 0.6 | isnan(robots(i).tag_estimation_history{k-3,1})
     targets(i,:) = generateRandomPointInCircle(robots(i).best_tag_estimation, 0.5*max_range);
 end
 

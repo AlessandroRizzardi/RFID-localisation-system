@@ -294,9 +294,9 @@ if TEST == 3
             error_x = abs(error_x);
             error_y = abs(error_y);
     
-            mean_x(trial) = mean(error_x(end-1500:end));
-            mean_y(trial) = mean(error_y(end-1500:end));
-            mean_dist(trial) = mean(error_dist(end-1500:end));
+            mean_x(trial) = mean(error_x(end-1800:end));
+            mean_y(trial) = mean(error_y(end-1800:end));
+            mean_dist(trial) = mean(error_dist(end-1800:end));
 
             var_x(trial) = sum((error_x - mean_x(trial)).^2)/length(error_x);
             var_y(trial) = sum((error_y - mean_y(trial)).^2)/length(error_y);
@@ -397,9 +397,9 @@ if TEST == 4
             error_x = abs(error_x);
             error_y = abs(error_y);
     
-            mean_x(trial) = mean(error_x(end-1500:end));
-            mean_y(trial) = mean(error_y(end-1500:end));
-            mean_dist(trial) = mean(error_dist(end-1500:end));
+            mean_x(trial) = mean(error_x(end-1800:end));
+            mean_y(trial) = mean(error_y(end-1800:end));
+            mean_dist(trial) = mean(error_dist(end-1800:end));
     
             var_x(trial) = sum((error_x - mean_x(trial)).^2)/length(error_x);
             var_y(trial) = sum((error_y - mean_y(trial)).^2)/length(error_y);

@@ -11,7 +11,7 @@ if tag_found_flag == false
 
 elseif tag_found_flag == true
 
-    if robots(i).distanceFromPoint(tag_found_position) <= 0.8
+    if robots(i).distanceFromPoint(tag_found_position) <= 0.6
         
         tag_found_position = generateRandomPointInCircle([border_rangetag_position(1), border_rangetag_position(2)],1);
         
