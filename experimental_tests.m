@@ -23,9 +23,9 @@ ANIMATION = false;
 PLOTS = true;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
-nExp = 300; % Simulations to do for every test
+nExp = 5; % Simulations to do for every test
 
-TEST = 3;  % 1: Monte-Carlo simulation with single robot
+TEST = 2;  % 1: Monte-Carlo simulation with single robot
            % 2: Test with single robot over different odometry noise
            % 3: Test with single robot over different phase error
            % 4: Test with different swarm dimension
@@ -57,14 +57,11 @@ if TEST == 1
         clean_estimation_history = remove_NaN_values(robots(1).tag_estimation_history); % remove NaN values
 
         for i = 1:length(clean_estimation_history)
-            error_x(i) = clean_estimation_history(i,1)-tag_position(1)*10^2;
-            error_y(i) = clean_estimation_history(i,2)-tag_position(2)*10^2;
-            error_dist(i) = sqrt(error_x(i)^2+error_y(i)^2)*10^2;
+            error_x(i) = (clean_estimation_history(i,1)-tag_position(1))*10^2;
+            error_y(i) = (clean_estimation_history(i,2)-tag_position(2))*10^2;
+            error_dist(i) = sqrt(error_x(i)^2+error_y(i)^2);
 
         end
-
-        error_x = abs(error_x);
-        error_y = abs(error_y);
 
         mean_x(trial) = mean(error_x(end-1800:end));
         mean_y(trial) = mean(error_y(end-1800:end));
@@ -73,6 +70,10 @@ if TEST == 1
         var_x(trial) = sum((error_x - mean_x(trial)).^2)/length(error_x);
         var_y(trial) = sum((error_y - mean_y(trial)).^2)/length(error_y);
         var_dist(trial) = sum((error_dist - mean_dist(trial)).^2)/length(error_dist);
+
+        ms_error_x(trial) = sum(mean_x - mean(mean_x))/length(mean_x);
+        ms_error_y(trial) = sum(mean_y - mean(mean_y))/length(mean_y);
+        ms_error_dist(trial) = sum(mean_dist - mean(mean_dist))/length(mean_dist);
 
         fprintf('--------- Trial: %d ---------\n',trial);
     end
@@ -155,7 +156,8 @@ if TEST == 2
     var_y = ones(nExp,1);
     var_dist = ones(nExp,1);
     
-    K_list = [0.01*10^-1, 0.01*10^-2, 0.01*10^-3, 0.01*10^-4];
+    %K_list = [0.01*10^-1, 0.01*10^-2, 0.01*10^-3, 0.01*10^-4];
+    K_list = [0.01*10^-2, 0.01*10^-3];
 
     for exp=1:length(K_list)
         KR = K_list(exp);
@@ -174,14 +176,12 @@ if TEST == 2
             clean_estimation_history = remove_NaN_values(robots(1).tag_estimation_history); % remove NaNA values
     
             for i = 1:length(clean_estimation_history)
-                error_x(i) = clean_estimation_history(i,1)-tag_position(1)*10^2;
-                error_y(i) = clean_estimation_history(i,2)-tag_position(2)*10^2;
-                error_dist(i) = sqrt(error_x(i)^2+error_y(i)^2)*10^2;
+                error_x(i) = (clean_estimation_history(i,1)-tag_position(1))*10^2;
+                error_y(i) = (clean_estimation_history(i,2)-tag_position(2))*10^2;
+                error_dist(i) = sqrt(error_x(i)^2+error_y(i)^2);
     
             end
-            error_x = abs(error_x);
-            error_y = abs(error_y);
-    
+            
             mean_x(trial) = mean(error_x(end-1500:end));
             mean_y(trial) = mean(error_y(end-1500:end));
             mean_dist(trial) = mean(error_dist(end-1500:end));
@@ -197,6 +197,10 @@ if TEST == 2
         mean_y_error(exp) = mean(mean_y);
         mean_dist_error(exp) = mean(mean_dist);
 
+        ms_error_x = sum(mean_x - mean(mean_x))/length(mean_x);
+        ms_error_y = sum(mean_y - mean(mean_y))/length(mean_y);
+        ms_error_dist = sum(mean_dist - mean(mean_dist))/length(mean_dist);
+
         fprintf('Exp with K = %d has mean error along x equal to %d cm with variance %d cm^2\n', K_list(exp),  round(mean(mean_x),3), round(mean(var_x),3));
         fprintf('Exp with K = %d has mean error along y equal to %d cm with variance %d cm^2\n', K_list(exp),  round(mean(mean_y),3),    round(mean(var_y),3));
         fprintf('Exp with K = %d has mean distance error equal to %d cm with variance %d cm^2\n', K_list(exp), round(mean(mean_dist),3), round(mean(var_dist),3));
@@ -210,6 +214,7 @@ if TEST == 2
     subplot(3,1,1)
     grid on
     leg = {};
+    plot(1:nExp,mean_x,'bo','MarkerSize',10)  
     for i = 1:length(K_list)
         yline(mean_x_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Odometry Error: ', num2str(K_list(i))]; 
@@ -224,6 +229,7 @@ if TEST == 2
     subplot(3,1,2)
     grid on
     leg = {};
+    plot(1:nExp,mean_y,'bo','MarkerSize',10)  
     for i = 1:length(K_list)
         yline(mean_y_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Odometry Error: ', num2str(K_list(i))]; 
@@ -238,6 +244,7 @@ if TEST == 2
     subplot(3,1,3)
     grid on
     leg = {};
+    plot(1:nExp,mean_dist,'bo','MarkerSize',10)  
     for i = 1:length(K_list)
         yline(mean_dist_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Odometry Error: ', num2str(K_list(i))]; 
@@ -286,14 +293,12 @@ if TEST == 3
             clean_estimation_history = remove_NaN_values(robots(1).tag_estimation_history); % remove NaN values
     
             for i = 1:length(clean_estimation_history)
-                error_x(i) = clean_estimation_history(i,1)-tag_position(1)*10^2;
-                error_y(i) = clean_estimation_history(i,2)-tag_position(2)*10^2;
-                error_dist(i) = sqrt(error_x(i)^2+error_y(i)^2)*10^2;
+                error_x(i) = (clean_estimation_history(i,1)-tag_position(1))*10^2;
+                error_y(i) = (clean_estimation_history(i,2)-tag_position(2))*10^2;
+                error_dist(i) = sqrt(error_x(i)^2+error_y(i)^2);
     
             end
-            error_x = abs(error_x);
-            error_y = abs(error_y);
-    
+        
             mean_x(trial) = mean(error_x(end-1500:end));
             mean_y(trial) = mean(error_y(end-1500:end));
             mean_dist(trial) = mean(error_dist(end-1500:end));
@@ -302,12 +307,17 @@ if TEST == 3
             var_y(trial) = sum((error_y - mean_y(trial)).^2)/length(error_y);
             var_dist(trial) = sum((error_dist - mean_dist(trial)).^2)/length(error_dist);
 
+            ms_error_x(trial) = sum(mean_x - mean(mean_x))/length(mean_x);
+            ms_error_y(trial) = sum(mean_y - mean(mean_y))/length(mean_y);
+            ms_error_dist(trial) = sum(mean_dist - mean(mean_dist))/length(mean_dist);
+
             % fprintf('--------- Trial: %d ---------\n',trial);
         end
         
         mean_x_error(exp) = mean(mean_x);
         mean_y_error(exp) = mean(mean_y);
         mean_dist_error(exp) = mean(mean_dist);
+
 
         fprintf('Exp with sigma_phi = %d has mean error along x equal to %d cm with variance %d cm^2\n', phase_error_list(exp), mean(mean_x), mean(var_x));
         fprintf('Exp with sigma_phi = %d has mean error along y equal to %d cm with variance %d cm^2\n', phase_error_list(exp), mean(mean_y), mean(var_y));
@@ -322,6 +332,7 @@ if TEST == 3
     subplot(3,1,1)
     grid on
     leg = {};
+    plot(1:nExp,mean_x,'bo','MarkerSize',10) 
     for i = 1:length(phase_error_list)
         yline(mean_x_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Phae Measurement Error: ', num2str(phase_error_list(i))]; 
@@ -336,6 +347,7 @@ if TEST == 3
     subplot(3,1,2)
     grid on
     leg = {};
+    plot(1:nExp,mean_y,'bo','MarkerSize',10) 
     for i = 1:length(phase_error_list)
         yline(mean_y_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Phae Measurement Error: ', num2str(phase_error_list(i))]; 
@@ -350,6 +362,7 @@ if TEST == 3
     subplot(3,1,3)
     grid on
     leg = {};
+    plot(1:nExp,mean_dist,'bo','MarkerSize',10) 
     for i = 1:length(phase_error_list)
         yline(mean_dist_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Phae Measurement Error: ', num2str(phase_error_list(i))]; 
@@ -390,12 +403,9 @@ if TEST == 4
             for i = 1:length(clean_estimation_history)
                 error_x(i) = (clean_estimation_history(i,1)-tag_position(1))*10^2;
                 error_y(i) = (clean_estimation_history(i,2)-tag_position(2))*10^2;
-                error_dist(i) = sqrt(error_x(i)^2+error_y(i)^2)*10^2;
+                error_dist(i) = sqrt(error_x(i)^2+error_y(i)^2);
     
             end
-    
-            error_x = abs(error_x);
-            error_y = abs(error_y);
     
             mean_x(trial) = mean(error_x(end-1500:end));
             mean_y(trial) = mean(error_y(end-1500:end));
@@ -417,7 +427,7 @@ if TEST == 4
         fprintf('Exp with %d ROBOTS has mean distance error equal to %d cm with variance %d cm^2\n', swarm_dimension(exp), mean(mean_dist), mean(var_dist));
 
     end
-%%
+
     % Vector of different colors
     line_color = ['#D95319','#0072BD',"#77AC30","#EDB120","#4DBEEE","#7E2F8E"];
 
@@ -425,6 +435,7 @@ if TEST == 4
     subplot(3,1,1)
     grid on
     leg = {};
+    plot(1:nExp,mean_x,'bo','MarkerSize',10) 
     for i = 1:length(swarm_dimension)
         yline(mean_x_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Num Robots: ', num2str(swarm_dimension(i))]; 
@@ -439,6 +450,7 @@ if TEST == 4
     subplot(3,1,2)
     grid on
     leg = {};
+    plot(1:nExp,mean_y,'bo','MarkerSize',10) 
     for i = 1:length(swarm_dimension) 
         yline(mean_y_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Num Robots: ', num2str(swarm_dimension(i))]; 
@@ -453,6 +465,7 @@ if TEST == 4
     subplot(3,1,3)
     grid on
     leg = {};
+    plot(1:nExp,mean_y,'bo','MarkerSize',10) 
     for i = 1:length(swarm_dimension)
         yline(mean_dist_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Num Robots: ', num2str(swarm_dimension(i))]; 
@@ -464,5 +477,27 @@ if TEST == 4
     legend(leg);
     hold off
 
-    sgtitle('Estimation Errors along numerous simulations for different robot swarm dimensions');  
+    sgtitle('Estimation Errors along numerous simulations for different robot swarm dimensions'); 
+    
+    
+    figure(2)
+    subplot(3,1,1)
+    plot(error_x, 'LineWidth', 2)
+    xlabel('Iterations');
+    ylabel('Error [cm]');
+    title('Error for X coordinate');   
+
+    subplot(3,1,2)
+    plot(error_y, 'LineWidth', 2)
+    title('Error for Y coordinate');
+    xlabel('Iterations');
+    ylabel('Error [cm]');
+
+    subplot(3,1,3)
+    plot(error_dist, 'LineWidth', 2)
+    xlabel('Iterations');
+    ylabel('Error [cm]');
+    title('Distance Error');
+
+    sgtitle('Tendency of Estimation Errors');
 end
