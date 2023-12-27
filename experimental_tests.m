@@ -23,7 +23,7 @@ ANIMATION = false;
 PLOTS = true;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
-nExp = 5; % Simulations to do for every test
+nExp = 100; % Simulations to do for every test
 
 TEST = 2;  % 1: Monte-Carlo simulation with single robot
            % 2: Test with single robot over different odometry noise
@@ -67,21 +67,13 @@ if TEST == 1
         mean_y(trial) = mean(error_y(end-1800:end));
         mean_dist(trial) = mean(error_dist(end-1800:end));
 
-        var_x(trial) = sum((error_x - mean_x(trial)).^2)/length(error_x);
-        var_y(trial) = sum((error_y - mean_y(trial)).^2)/length(error_y);
-        var_dist(trial) = sum((error_dist - mean_dist(trial)).^2)/length(error_dist);
-
-        ms_error_x(trial) = sum(mean_x - mean(mean_x))/length(mean_x);
-        ms_error_y(trial) = sum(mean_y - mean(mean_y))/length(mean_y);
-        ms_error_dist(trial) = sum(mean_dist - mean(mean_dist))/length(mean_dist);
-
         fprintf('--------- Trial: %d ---------\n',trial);
     end
 
     figure (1)
     subplot(3,1,1)
     grid on
-    plot(exp,mean_x,'bo','MarkerSize',10)  
+    plot(exp,mean_x,'bo')  
     hold on   
     yline(mean(mean_x),'r--','LineWidth',2)         
     title('Error for X coordinate');                            
@@ -118,6 +110,10 @@ if TEST == 1
     fprintf('Mean error along x: %d\n', round(mean(mean_x),3));
     fprintf('Mean error along y: %d\n', round(mean(mean_y),3));
     fprintf('Mean error distance error: %d\n', round(mean(mean_dist),3));
+
+    fprintf('Mean Squared Error along x: %d\n', round(sum((mean_x - mean(mean_x))^2)/length(mean_x),3));
+    fprintf('Mean Squared Error along y: %d\n', round(sum((mean_y - mean(mean_y))^2)/length(mean_y),3));
+    fprintf('Mean Squared Error distance error: %d\n', round(sum((mean_dist - mean(mean_dist))^2)/length(mean_dist),3));
     
 
     figure(2)
@@ -182,28 +178,26 @@ if TEST == 2
     
             end
             
-            mean_x(trial) = mean(error_x(end-1500:end));
-            mean_y(trial) = mean(error_y(end-1500:end));
-            mean_dist(trial) = mean(error_dist(end-1500:end));
-
-            var_x(trial) = sum((error_x - mean_x(trial)).^2)/length(error_x);
-            var_y(trial) = sum((error_y - mean_y(trial)).^2)/length(error_y);
-            var_dist(trial) = sum((error_dist - mean_dist(trial)).^2)/length(error_dist);
+            mean_x(exp,trial) = mean(error_x(end-1500:end));
+            mean_y(exp,trial) = mean(error_y(end-1500:end));
+            mean_dist(exp,trial) = mean(error_dist(end-1500:end));
 
             fprintf('--------- Trial: %d ---------\n',trial);
         end
         
-        mean_x_error(exp) = mean(mean_x);
-        mean_y_error(exp) = mean(mean_y);
-        mean_dist_error(exp) = mean(mean_dist);
+        
+        %Mean squared error
+        ms_error_x(exp) = sum((mean_x(exp,:) - mean(mean_x(exp,:))).^2)/length(mean_x(exp,:));
+        ms_error_y(exp) = sum((mean_y(exp,:) - mean(mean_y(exp,:))).^2)/length(mean_y(exp,:));
+        ms_error_dist(exp) = sum((mean_dist(exp,:) - mean(mean_dist(exp,:))).^2)/length(mean_dist(exp,:));
+        
+        fprintf('Exp with K = %d has mean error along x equal to %d cm  \n' , K_list(exp), round(   mean(mean_x(exp,:))    ,3) );
+        fprintf('Exp with K = %d has mean error along y equal to %d cm  \n' , K_list(exp), round(   mean(mean_y(exp,:))    ,3) );
+        fprintf('Exp with K = %d has mean distance error equal to %d cm \n' , K_list(exp), round(   mean(mean_dist(exp,:)) ,3) );
 
-        ms_error_x = sum(mean_x - mean(mean_x))/length(mean_x);
-        ms_error_y = sum(mean_y - mean(mean_y))/length(mean_y);
-        ms_error_dist = sum(mean_dist - mean(mean_dist))/length(mean_dist);
-
-        fprintf('Exp with K = %d has mean error along x equal to %d cm with variance %d cm^2\n', K_list(exp),  round(mean(mean_x),3), round(mean(var_x),3));
-        fprintf('Exp with K = %d has mean error along y equal to %d cm with variance %d cm^2\n', K_list(exp),  round(mean(mean_y),3),    round(mean(var_y),3));
-        fprintf('Exp with K = %d has mean distance error equal to %d cm with variance %d cm^2\n', K_list(exp), round(mean(mean_dist),3), round(mean(var_dist),3));
+        fprintf('Mean Squared Error along x: %d\n'          , round(    ms_error_x(exp)     ,3) );
+        fprintf('Mean Squared Error along y: %d\n'          , round(    ms_error_y(exp)     ,3) );
+        fprintf('Mean Squared Error distance error: %d\n'   , round(    ms_error_dist(exp)  ,3) );
 
     end
     
@@ -214,9 +208,9 @@ if TEST == 2
     subplot(3,1,1)
     grid on
     leg = {};
-    plot(1:nExp,mean_x,'bo','MarkerSize',10)  
     for i = 1:length(K_list)
-        yline(mean_x_error(i),'Color',line_color(i),'LineWidth',2) 
+        plot(1:nExp,mean_x(i,:),'bo', 'Color', line_color(i))  
+        yline(mean(mean_x(i,:)),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Odometry Error: ', num2str(K_list(i))]; 
         hold on   
     end      
@@ -229,13 +223,13 @@ if TEST == 2
     subplot(3,1,2)
     grid on
     leg = {};
-    plot(1:nExp,mean_y,'bo','MarkerSize',10)  
     for i = 1:length(K_list)
-        yline(mean_y_error(i),'Color',line_color(i),'LineWidth',2) 
+        plot(1:nExp,mean_y(i,:),'bo','Color',line_color(i))  
+        yline(mean(mean_y(i,:)),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Odometry Error: ', num2str(K_list(i))]; 
         hold on   
     end      
-    title('Mean Error for X coordinate');                      
+    title('Mean Error for Y coordinate');                      
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
@@ -244,13 +238,13 @@ if TEST == 2
     subplot(3,1,3)
     grid on
     leg = {};
-    plot(1:nExp,mean_dist,'bo','MarkerSize',10)  
     for i = 1:length(K_list)
-        yline(mean_dist_error(i),'Color',line_color(i),'LineWidth',2) 
+        plot(1:nExp,mean_dist(i,:),'bo','Color',line_color(i))  
+        yline(mean(mean_dist(i,:)),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Odometry Error: ', num2str(K_list(i))]; 
         hold on   
     end      
-    title('Mean Error for X coordinate');                      
+    title('Mean Error of distance estimates');                      
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
@@ -299,30 +293,27 @@ if TEST == 3
     
             end
         
-            mean_x(trial) = mean(error_x(end-1500:end));
-            mean_y(trial) = mean(error_y(end-1500:end));
-            mean_dist(trial) = mean(error_dist(end-1500:end));
-
-            var_x(trial) = sum((error_x - mean_x(trial)).^2)/length(error_x);
-            var_y(trial) = sum((error_y - mean_y(trial)).^2)/length(error_y);
-            var_dist(trial) = sum((error_dist - mean_dist(trial)).^2)/length(error_dist);
-
-            ms_error_x(trial) = sum(mean_x - mean(mean_x))/length(mean_x);
-            ms_error_y(trial) = sum(mean_y - mean(mean_y))/length(mean_y);
-            ms_error_dist(trial) = sum(mean_dist - mean(mean_dist))/length(mean_dist);
+            mean_x(exp,trial) = mean(error_x(end-1500:end));
+            mean_y(exp,trial) = mean(error_y(end-1500:end));
+            mean_dist(exp,trial) = mean(error_dist(end-1500:end));
 
             % fprintf('--------- Trial: %d ---------\n',trial);
         end
         
-        mean_x_error(exp) = mean(mean_x);
-        mean_y_error(exp) = mean(mean_y);
-        mean_dist_error(exp) = mean(mean_dist);
+        %Mean squared error
+        ms_error_x(exp) = sum((mean_x(exp,:) - mean(mean_x(exp,:)))^2)/length(mean_x(exp,:));
+        ms_error_y(exp) = sum((mean_y(exp,:) - mean(mean_y(exp,:)))^2)/length(mean_y(exp,:));
+        ms_error_dist(exp) = sum((mean_dist(exp,:) - mean(mean_dist(exp,:)))^2)/length(mean_dist(exp,:));
 
 
-        fprintf('Exp with sigma_phi = %d has mean error along x equal to %d cm with variance %d cm^2\n', phase_error_list(exp), mean(mean_x), mean(var_x));
-        fprintf('Exp with sigma_phi = %d has mean error along y equal to %d cm with variance %d cm^2\n', phase_error_list(exp), mean(mean_y), mean(var_y));
-        fprintf('Exp with sigma_phi = %d has mean distance error equal to %d cm with variance %d cm^2\n', phase_error_list(exp), mean(mean_dist), mean(var_dist));
+        fprintf('Exp with sigma_phi = %d has mean error along x equal to %d cm ', phase_error_list(exp), mean(mean_x)       );
+        fprintf('Exp with sigma_phi = %d has mean error along y equal to %d cm ', phase_error_list(exp), mean(mean_y)       );
+        fprintf('Exp with sigma_phi = %d has mean distance error equal to %d cm', phase_error_list(exp), mean(mean_dist)    );
 
+        fprintf('Mean Squared Error along x: %d\n'        , round(    ms_error_x(exp)     ,3) );
+        fprintf('Mean Squared Error along y: %d\n'        , round(    ms_error_y(exp)     ,3) );
+        fprintf('Mean Squared Error distance error: %d\n' , round(    ms_error_dist(exp)  ,3) );
+        
     end
 
     % Vector of different colors
@@ -332,8 +323,8 @@ if TEST == 3
     subplot(3,1,1)
     grid on
     leg = {};
-    plot(1:nExp,mean_x,'bo','MarkerSize',10) 
     for i = 1:length(phase_error_list)
+        plot(1:nExp,mean_x,'bo','Color',line_color(i)) 
         yline(mean_x_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Phae Measurement Error: ', num2str(phase_error_list(i))]; 
         hold on   
@@ -347,13 +338,13 @@ if TEST == 3
     subplot(3,1,2)
     grid on
     leg = {};
-    plot(1:nExp,mean_y,'bo','MarkerSize',10) 
+    plot(1:nExp,mean_y,'bo','Color',line_color(i)) 
     for i = 1:length(phase_error_list)
         yline(mean_y_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Phae Measurement Error: ', num2str(phase_error_list(i))]; 
         hold on   
     end      
-    title('Mean Error for X coordinate');                      
+    title('Mean Error for Y coordinate');                      
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
@@ -362,13 +353,13 @@ if TEST == 3
     subplot(3,1,3)
     grid on
     leg = {};
-    plot(1:nExp,mean_dist,'bo','MarkerSize',10) 
+    plot(1:nExp,mean_dist,'bo','Color',line_color(i)) 
     for i = 1:length(phase_error_list)
         yline(mean_dist_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Phae Measurement Error: ', num2str(phase_error_list(i))]; 
         hold on   
     end      
-    title('Mean Error for X coordinate');                      
+    title('Mean Error of distance estimates');                      
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
@@ -407,24 +398,27 @@ if TEST == 4
     
             end
     
-            mean_x(trial) = mean(error_x(end-1500:end));
-            mean_y(trial) = mean(error_y(end-1500:end));
-            mean_dist(trial) = mean(error_dist(end-1500:end));
+            mean_x(exp,trial) = mean(error_x(end-1500:end));
+            mean_y(exp,trial) = mean(error_y(end-1500:end));
+            mean_dist(exp,trial) = mean(error_dist(end-1500:end));
     
-            var_x(trial) = sum((error_x - mean_x(trial)).^2)/length(error_x);
-            var_y(trial) = sum((error_y - mean_y(trial)).^2)/length(error_y);
-            var_dist(trial) = sum((error_dist - mean_dist(trial)).^2)/length(error_dist);
+            
     
             % fprintf('--------- Trial: %d ---------\n',trial);
         end
 
-        mean_x_error(exp) = mean(mean_x);
-        mean_y_error(exp) = mean(mean_y);
-        mean_dist_error(exp) = mean(mean_dist);
+        %Mean squared error
+        ms_error_x(exp) = sum((mean_x(exp,:) - mean(mean_x(exp,:)))^2)/length(mean_x(exp,:));
+        ms_error_y(exp) = sum((mean_y(exp,:) - mean(mean_y(exp,:)))^2)/length(mean_y(exp,:));
+        ms_error_dist(exp) = sum((mean_dist(exp,:) - mean(mean_dist(exp,:)))^2)/length(mean_dist(exp,:));
 
-        fprintf('Exp with %d ROBOTS has mean error along x equal to %d cm with variance %d cm^2\n', swarm_dimension(exp), mean(mean_x), mean(var_x));
-        fprintf('Exp with %d ROBOTS has mean error along y equal to %d cm with variance %d cm^2\n', swarm_dimension(exp), mean(mean_y), mean(var_y));
-        fprintf('Exp with %d ROBOTS has mean distance error equal to %d cm with variance %d cm^2\n', swarm_dimension(exp), mean(mean_dist), mean(var_dist));
+        fprintf('Exp with %d ROBOTS has mean error along y equal to %d cm ' , swarm_dimension(exp), mean(mean_y)    );
+        fprintf('Exp with %d ROBOTS has mean error along x equal to %d cm ' , swarm_dimension(exp), mean(mean_x)    );
+        fprintf('Exp with %d ROBOTS has mean distance error equal to %d cm' , swarm_dimension(exp), mean(mean_dist) );
+
+        fprintf('Exp with %d ROBOTS Mean Squared Error along x: %d\n'        , swarm_dimension(exp), round(    ms_error_x(exp)     ,3) );
+        fprintf('Exp with %d ROBOTS Mean Squared Error along y: %d\n'        , swarm_dimension(exp), round(    ms_error_y(exp)     ,3) );
+        fprintf('Exp with %d ROBOTS Mean Squared Error distance error: %d\n' , swarm_dimension(exp), round(    ms_error_dist(exp)  ,3) );
 
     end
 
@@ -435,8 +429,8 @@ if TEST == 4
     subplot(3,1,1)
     grid on
     leg = {};
-    plot(1:nExp,mean_x,'bo','MarkerSize',10) 
     for i = 1:length(swarm_dimension)
+        plot(1:nExp,mean_x,'bo','Color',line_color(i)) 
         yline(mean_x_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Num Robots: ', num2str(swarm_dimension(i))]; 
         hold on   
@@ -450,8 +444,8 @@ if TEST == 4
     subplot(3,1,2)
     grid on
     leg = {};
-    plot(1:nExp,mean_y,'bo','MarkerSize',10) 
     for i = 1:length(swarm_dimension) 
+        plot(1:nExp,mean_y,'bo','Color',line_color(i)) 
         yline(mean_y_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Num Robots: ', num2str(swarm_dimension(i))]; 
         hold on   
@@ -465,8 +459,8 @@ if TEST == 4
     subplot(3,1,3)
     grid on
     leg = {};
-    plot(1:nExp,mean_y,'bo','MarkerSize',10) 
     for i = 1:length(swarm_dimension)
+        plot(1:nExp,mean_y,'bo','Color',line_color(i)) 
         yline(mean_dist_error(i),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = ['Num Robots: ', num2str(swarm_dimension(i))]; 
         hold on   
