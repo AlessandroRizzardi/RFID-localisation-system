@@ -274,7 +274,8 @@ if TEST == 3
     var_x = ones(nExp,1);
     var_y = ones(nExp,1);
     var_dist = ones(nExp,1);
-    phase_error_list = [0.2, pi/4 , pi/2, pi, 3*pi/4, 2*pi];
+    % phase_error_list = [0.2, pi/4 , pi/2, pi, 3*pi/4, pi];
+    phase_error_list = [pi/2, pi, 2*pi, 4*pi];
 
     for exp = 1:length(phase_error_list)
 
