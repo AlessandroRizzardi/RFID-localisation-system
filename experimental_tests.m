@@ -23,9 +23,9 @@ ANIMATION = false;
 PLOTS = true;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
-nExp = 5; % Simulations to do for every test
+nExp = 3; % Simulations to do for every test
 
-TEST = 4;  % 1: Monte-Carlo simulation with single robot
+TEST = 2;  % 1: Monte-Carlo simulation with single robot
            % 2: Test with single robot over different odometry noise
            % 3: Test with single robot over different phase error
            % 4: Test with different swarm dimension
@@ -73,24 +73,26 @@ if TEST == 1
     figure (1)
     subplot(3,1,1)
     grid on
-    plot(exp,mean_x,'bo')  
     hold on   
+    plot(exp,mean_x,'bo')  
     yline(mean(mean_x),'r--','LineWidth',2)         
     title('Error for X coordinate');                            
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend('Error','Mean Error','Location','best');
+    pbaspect([4 1 1])
     hold off
     
     subplot(3,1,2)
     grid on
-    plot(exp,mean_y,'bo');
     hold on
+    plot(exp,mean_y,'bo');
     yline(mean(mean_y), 'r--', 'LineWidth', 2)
     title('Error for Y coordinate');
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend('Error','Mean Error','Location','best');
+    pbaspect([4 1 1])
     hold off
 
     subplot(3,1,3)
@@ -102,6 +104,7 @@ if TEST == 1
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend('Error','Mean Error','Location','best');
+    pbaspect([4 1 1])
 
     sgtitle(sprintf('Estimation Errors along %d experiments', nExp));  
 
@@ -156,7 +159,7 @@ if TEST == 2
     var_y = ones(nExp,1);
     var_dist = ones(nExp,1);
     
-    K_list = [0.01*10^-1, 0.01*10^-2, 0.01*10^-3, 0.01*10^-5];
+    K_list = [0.01, 0.01*10^-1,0.01*10^-5];
    
 
     for exp=1:length(K_list)
@@ -211,6 +214,7 @@ if TEST == 2
     figure (1)
     subplot(3,1,1)
     grid on
+    hold on
     leg = {};
     for i = 1:length(K_list)
         plot(1:nExp,mean_x(i,:),'bo', 'Color', line_color(i))  
@@ -223,10 +227,12 @@ if TEST == 2
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
+    pbaspect([4 1 1])
     hold off
     
     subplot(3,1,2)
     grid on
+    hold on
     leg = {};
     for i = 1:length(K_list)
         plot(1:nExp,mean_y(i,:),'bo','Color',line_color(i))  
@@ -239,10 +245,12 @@ if TEST == 2
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
+    pbaspect([4 1 1])
     hold off
 
     subplot(3,1,3)
     grid on
+    hold on
     leg = {};
     for i = 1:length(K_list)
         plot(1:nExp,mean_dist(i,:),'bo','Color',line_color(i))  
@@ -255,6 +263,7 @@ if TEST == 2
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
+    pbaspect([4 1 1])
     hold off
 
    sgtitle('Estimation Errors along numerous simulations for different encoder readings noises');  
@@ -274,7 +283,7 @@ if TEST == 3
     var_x = ones(nExp,1);
     var_y = ones(nExp,1);
     var_dist = ones(nExp,1);
-    phase_error_list = [0.2, pi/4 , pi/2, pi, 3*pi/4, 2*pi];
+    phase_error_list = [0.2, pi/4 , pi/2, 3*pi/4, pi , 2*pi];
 
     for exp = 1:length(phase_error_list)
 
@@ -329,6 +338,7 @@ if TEST == 3
     figure (1)
     subplot(3,1,1)
     grid on
+    hold on
     leg = {};
     for i = 1:length(phase_error_list)
         plot(1:nExp,mean_x(i,:),'bo','Color',line_color(i)) 
@@ -341,10 +351,12 @@ if TEST == 3
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
+    pbaspect([4 1 1])
     hold off
     
     subplot(3,1,2)
     grid on
+    hold on
     leg = {};
     for i = 1:length(phase_error_list)
         plot(1:nExp,mean_y(i,:),'bo','Color',line_color(i)) 
@@ -357,10 +369,12 @@ if TEST == 3
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
+    pbaspect([4 1 1])
     hold off
 
     subplot(3,1,3)
     grid on
+    hold on
     leg = {};
     for i = 1:length(phase_error_list)
         plot(1:nExp,mean_dist(i,:),'bo','Color',line_color(i)) 
@@ -373,6 +387,7 @@ if TEST == 3
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
+    pbaspect([4 1 1])
     hold off
 
     sgtitle('Estimation Errors along numerous simulations for different phase measurement errors');  
@@ -438,6 +453,7 @@ if TEST == 4
     figure (1)
     subplot(3,1,1)
     grid on
+    hold on
     leg = {};
     for i = 1:length(swarm_dimension)
         plot(1:nExp,mean_x(i,:),'bo','Color',line_color(i)) 
@@ -450,10 +466,12 @@ if TEST == 4
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
+    pbaspect([4 1 1])
     hold off
     
     subplot(3,1,2)
     grid on
+    hold on
     leg = {};
     for i = 1:length(swarm_dimension) 
         plot(1:nExp,mean_y(i,:),'bo','Color',line_color(i)) 
@@ -466,10 +484,12 @@ if TEST == 4
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
+    pbaspect([4 1 1])
     hold off
 
     subplot(3,1,3)
     grid on
+    hold on
     leg = {};
     for i = 1:length(swarm_dimension)
         plot(1:nExp,mean_dist(i,:),'bo','Color',line_color(i)) 
@@ -482,6 +502,7 @@ if TEST == 4
     xlabel('Num Experiments');
     ylabel('Error [cm]');
     legend(leg);
+    pbaspect([4 1 1])
     hold off
 
     sgtitle('Estimation Errors along numerous simulations for different robot swarm dimensions'); 
@@ -489,6 +510,7 @@ if TEST == 4
     leg = {};
     figure(2)
     subplot(3,1,1)
+    grid on
     hold on
     for exp = 1:length(swarm_dimension)
         plot(cell2mat(error_x(exp,:)), 'LineWidth', 2)
@@ -499,10 +521,12 @@ if TEST == 4
     title('Error for X coordinate');
     ylim([-100 100])
     legend(leg)
+    pbaspect([4 1 1])
     hold off
     
     leg = {};
     subplot(3,1,2)
+    grid on
     hold on
     for exp = 1:length(swarm_dimension)
         plot(cell2mat(error_y(exp,:)), 'LineWidth', 2)
@@ -513,10 +537,12 @@ if TEST == 4
     ylabel('Error [cm]');
     ylim([-100 100])
     legend(leg)
+    pbaspect([4 1 1])
     hold off
     
     leg = {};
     subplot(3,1,3)
+    grid on
     hold on
     for exp = 1:length(swarm_dimension)
         plot(cell2mat(error_dist(exp,:)), 'LineWidth', 2)
@@ -527,6 +553,7 @@ if TEST == 4
     title('Distance Error');
     ylim([-100 100])
     legend(leg)
+    pbaspect([4 1 1])
     hold off
 
     sgtitle('Tendency of Estimation Errors');
