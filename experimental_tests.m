@@ -23,9 +23,9 @@ ANIMATION = false;
 PLOTS = true;
 %%%%%%%%%%  END SETTINGS    %%%%%%%%%%%%%
 
-nExp = 3; % Simulations to do for every test
+nExp = 500; % Simulations to do for every test
 
-TEST = 2;  % 1: Monte-Carlo simulation with single robot
+TEST = 4;  % 1: Monte-Carlo simulation with single robot
            % 2: Test with single robot over different odometry noise
            % 3: Test with single robot over different phase error
            % 4: Test with different swarm dimension
@@ -398,7 +398,7 @@ end
 if TEST == 4
     fprintf('!!!! TEST CASE: Performing different simulations with different number of robots !!!!\n')
     
-    swarm_dimension = [3, 10, 30];
+    swarm_dimension = [5, 10, 30];
     error_x = cell(length(swarm_dimension),1);
     error_y = cell(length(swarm_dimension),1);
     error_dist = cell(length(swarm_dimension),1);
@@ -456,7 +456,7 @@ if TEST == 4
     hold on
     leg = {};
     for i = 1:length(swarm_dimension)
-        plot(1:nExp,mean_x(i,:),'bo','Color',line_color(i)) 
+        plot(1:nExp,mean_x(i,:),'bo','MarkerSize',3,'Color',line_color(i)) 
         yline(mean(mean_x(i,:)),'Color',line_color(i),'LineWidth',2)
         leg{end+1} = ''; 
         leg{end+1} = ['Num Robots: ', num2str(swarm_dimension(i))]; 
@@ -474,7 +474,7 @@ if TEST == 4
     hold on
     leg = {};
     for i = 1:length(swarm_dimension) 
-        plot(1:nExp,mean_y(i,:),'bo','Color',line_color(i)) 
+        plot(1:nExp,mean_y(i,:),'bo','MarkerSize',3,'Color',line_color(i)) 
         yline(mean(mean_y(i,:)),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = '';
         leg{end+1} = ['Num Robots: ', num2str(swarm_dimension(i))]; 
@@ -492,7 +492,7 @@ if TEST == 4
     hold on
     leg = {};
     for i = 1:length(swarm_dimension)
-        plot(1:nExp,mean_dist(i,:),'bo','Color',line_color(i)) 
+        plot(1:nExp,mean_dist(i,:),'bo','MarkerSize',3,'Color',line_color(i)) 
         yline(mean(mean_dist(i,:)),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = '';
         leg{end+1} = ['Num Robots: ', num2str(swarm_dimension(i))]; 
@@ -513,7 +513,7 @@ if TEST == 4
     grid on
     hold on
     for exp = 1:length(swarm_dimension)
-        plot(cell2mat(error_x(exp,:)), 'LineWidth', 2)
+        plot(cell2mat(error_x(exp,:)), 'LineWidth', 2,'Color',line_color(exp))
         leg{end+1} = ['Num robots: ',num2str(swarm_dimension(exp))];
     end
     xlabel('Iterations');
@@ -529,7 +529,7 @@ if TEST == 4
     grid on
     hold on
     for exp = 1:length(swarm_dimension)
-        plot(cell2mat(error_y(exp,:)), 'LineWidth', 2)
+        plot(cell2mat(error_y(exp,:)), 'LineWidth', 2,'Color',line_color(exp))
         leg{end+1} = ['Num robots: ',num2str(swarm_dimension(exp))];
     end
     title('Error for Y coordinate');
@@ -545,7 +545,7 @@ if TEST == 4
     grid on
     hold on
     for exp = 1:length(swarm_dimension)
-        plot(cell2mat(error_dist(exp,:)), 'LineWidth', 2)
+        plot(cell2mat(error_dist(exp,:)), 'LineWidth', 2,'Color',line_color(exp))
         leg{end+1} = ['Num robots: ',num2str(swarm_dimension(exp))];
     end
     xlabel('Iterations');
