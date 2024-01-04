@@ -25,7 +25,7 @@ PLOTS = true;
 
 nExp = 500; % Simulations to do for every test
 
-TEST = 4;  % 1: Monte-Carlo simulation with single robot
+TEST = 3;  % 1: Monte-Carlo simulation with single robot
            % 2: Test with single robot over different odometry noise
            % 3: Test with single robot over different phase error
            % 4: Test with different swarm dimension
@@ -283,7 +283,7 @@ if TEST == 3
     var_x = ones(nExp,1);
     var_y = ones(nExp,1);
     var_dist = ones(nExp,1);
-    phase_error_list = [0.2, pi/4 , pi/2, 3*pi/4, pi , 2*pi];
+    phase_error_list = [3*pi/4, pi , 2*pi];
 
     for exp = 1:length(phase_error_list)
 
@@ -341,7 +341,7 @@ if TEST == 3
     hold on
     leg = {};
     for i = 1:length(phase_error_list)
-        plot(1:nExp,mean_x(i,:),'bo','Color',line_color(i)) 
+        plot(1:nExp,mean_x(i,:),'bo', 'MarkerSize',3,'Color',line_color(i)) 
         yline(mean(mean_x(i,:)),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = '';
         leg{end+1} = ['Phae Measurement Error: ', num2str(phase_error_list(i))]; 
@@ -359,7 +359,7 @@ if TEST == 3
     hold on
     leg = {};
     for i = 1:length(phase_error_list)
-        plot(1:nExp,mean_y(i,:),'bo','Color',line_color(i)) 
+        plot(1:nExp,mean_y(i,:),'bo','MarkerSize',3,'Color',line_color(i)) 
         yline(mean(mean_y(i,:)),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = '';
         leg{end+1} = ['Phae Measurement Error: ', num2str(phase_error_list(i))]; 
@@ -377,7 +377,7 @@ if TEST == 3
     hold on
     leg = {};
     for i = 1:length(phase_error_list)
-        plot(1:nExp,mean_dist(i,:),'bo','Color',line_color(i)) 
+        plot(1:nExp,mean_dist(i,:),'bo','MarkerSize',3,'Color',line_color(i)) 
         yline(mean(mean_dist(i,:)),'Color',line_color(i),'LineWidth',2) 
         leg{end+1} = '';
         leg{end+1} = ['Phae Measurement Error: ', num2str(phase_error_list(i))]; 
