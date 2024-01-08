@@ -1,7 +1,7 @@
 % This files contains all the parameters used while running the SLAM algorithms
 
 
-Tf = 40; % Total time [s]
+Tf = 25; % Total time [s]
 %Ts = 1; % Sampling time [s]
 dt = 10^-2; % integration-scheme timestep
 

@@ -24,10 +24,11 @@ t = 0:dt:Tf;
 targets = [];
 
 for i=1:nRobots
-    target = generateRandomPointInCircle([tag_position(1),tag_position(2)],1); % actually set to go towards the target, change for real simulation
+    % target = generateRandomPointInCircle([tag_position(1),tag_position(2)],1); % actually set to go towards the target, change for real simulation
+    target = generateRandomPointInCircle([0,0],radius_map);
     targets = [targets; target];
 end
 
 last_nonNaN_estimation = NaN;
 
-%fprintf('--------- Steps da fare: %d ---------\n\n',steps);
+% fprintf('--------- Steps da fare: %d ---------\n\n',steps);
